@@ -10,9 +10,6 @@ import {
   Info,
   Loader2,
   ArrowRight,
-  Shield,
-  Clock,
-  BarChart3,
   Sparkles,
 } from "lucide-react";
 
@@ -29,29 +26,6 @@ export default function Home() {
     }
   };
 
-  const features = [
-    {
-      icon: Clock,
-      title: "Real-time",
-      desc: "Data kehadiran diperbarui secara berkala",
-      color: "text-blue-600 dark:text-blue-400",
-      bg: "bg-blue-50 dark:bg-blue-950/30",
-    },
-    {
-      icon: BarChart3,
-      title: "Statistik",
-      desc: "Ringkasan persentase kehadiran otomatis",
-      color: "text-emerald-600 dark:text-emerald-400",
-      bg: "bg-emerald-50 dark:bg-emerald-950/30",
-    },
-    {
-      icon: Shield,
-      title: "Aman",
-      desc: "Akses data hanya dengan nomor terdaftar",
-      color: "text-violet-600 dark:text-violet-400",
-      bg: "bg-violet-50 dark:bg-violet-950/30",
-    },
-  ];
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 font-sans dark:bg-zinc-950 relative overflow-hidden">
@@ -77,7 +51,7 @@ export default function Home() {
                 Portal Absensi
               </h1>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 leading-relaxed max-w-sm mx-auto">
-                Pantau kehadiran dan performa belajar Anda secara real-time. Masukkan nomor WhatsApp terdaftar untuk memulai.
+                Pantau kehadiran dan performa belajar Anda selama ini. Masukkan nomor WhatsApp terdaftar untuk memulai.
               </p>
             </div>
             <div className="flex items-center justify-center gap-1.5">
@@ -106,7 +80,7 @@ export default function Home() {
               </div>
               <p className="text-xs text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5">
                 <Info className="h-3 w-3 shrink-0" />
-                Pastikan nomor WA aktif dan sesuai dengan data pendaftaran.
+                Pastikan nomor WA aktif dan sesuai dengan data pendaftaran. Gunakan format 08-nomor-anda.
               </p>
             </div>
 
@@ -131,21 +105,7 @@ export default function Home() {
           </form>
         </div>
 
-        {/* Feature Cards */}
-        <div className="grid grid-cols-3 gap-3">
-          {features.map((f) => (
-            <div
-              key={f.title}
-              className="rounded-xl border border-zinc-200/80 bg-white/80 backdrop-blur-sm p-3 text-center dark:border-zinc-800 dark:bg-zinc-900/80 hover:shadow-md transition-all hover:-translate-y-0.5"
-            >
-              <div className={`inline-flex p-2 rounded-lg ${f.bg} mb-2`}>
-                <f.icon className={`h-4 w-4 ${f.color}`} />
-              </div>
-              <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200">{f.title}</p>
-              <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5 leading-tight">{f.desc}</p>
-            </div>
-          ))}
-        </div>
+  
 
         {/* Footer */}
         <div className="text-center text-[11px] text-zinc-400 dark:text-zinc-600">

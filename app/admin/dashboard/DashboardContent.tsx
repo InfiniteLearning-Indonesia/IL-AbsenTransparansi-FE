@@ -545,9 +545,10 @@ export default function DashboardContent() {
                                                 Sinkronisasi Data Airtable
                                             </h3>
                                             <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                                Proses ini akan mengambil data kehadiran mentee dari Airtable dan menyimpannya ke database lokal.
+                                                Proses ini akan mengambil data kehadiran mentee dari Airtable dan menyimpannya ke database MongoDB yang terhubung ke backend.
                                                 Data yang sudah ada akan diperbarui, dan data baru akan ditambahkan secara otomatis.
                                                 <strong className="text-zinc-700 dark:text-zinc-300"> Sinkronisasi hanya berjalan saat tombol ditekan.</strong>
+                                                <strong className="text-zinc-700 dark:text-zinc-300"> Lakukan sync tiap jam 13.00 WIB jika sesi pagi dan tiap 22.00 WIB jika sesi malam.</strong>
                                             </p>
                                             <div className="flex items-center gap-4 mt-3 text-xs text-zinc-500 dark:text-zinc-400">
                                                 <span className="flex items-center gap-1">

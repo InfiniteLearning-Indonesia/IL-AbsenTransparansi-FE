@@ -335,6 +335,11 @@ export default function AbsenContent() {
                     })}
                 </div>
 
+                <div className="flex items-center justify-center gap-2 rounded-xl bg-blue-50/50 px-4 py-2 text-blue-700 dark:bg-blue-900/10 dark:text-blue-300 border border-blue-100 dark:border-blue-900/20">
+                    <Clock className="h-3.5 w-3.5" />
+                    <p className="text-xs font-semibold">Absen diperbarui tiap jam 13.00 WIB di sesi pagi dan 22.00 WIB di sesi malam.</p>
+                </div>
+
                 {/* Attendance Table */}
                 <Card className="border-zinc-200/80 dark:border-zinc-800 shadow-sm rounded-2xl overflow-hidden">
                     <CardHeader className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 pb-4">
