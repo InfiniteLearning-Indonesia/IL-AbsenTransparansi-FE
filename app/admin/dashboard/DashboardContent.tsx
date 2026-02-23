@@ -44,6 +44,7 @@ import {
     EyeOff,
     Save,
     Shield,
+    UserCog,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -60,9 +61,9 @@ const MONTHS = [
     { value: "Jun", label: "Juni" },
 ];
 
-type TabId = "all" | "sync" | "web" | "mobile" | "ai" | "history" | "settings";
+type TabId = "all" | "sync" | "web" | "mobile" | "ai" | "history" | "settings" | `mentor_${string}`;
 
-const TAB_META: Record<TabId, { title: string; subtitle: string }> = {
+const STATIC_TAB_META: Record<string, { title: string; subtitle: string }> = {
     all: {
         title: "Mentee Overview",
         subtitle: "Ringkasan data kehadiran seluruh mentee di semua program",
@@ -93,6 +94,18 @@ const TAB_META: Record<TabId, { title: string; subtitle: string }> = {
     },
 };
 
+function getTabMeta(tabId: TabId): { title: string; subtitle: string } {
+    if (STATIC_TAB_META[tabId]) return STATIC_TAB_META[tabId];
+    if (tabId.startsWith("mentor_")) {
+        const mentorName = tabId.replace("mentor_", "");
+        return {
+            title: `${mentorName}'s Mentees`,
+            subtitle: `Data kehadiran mentee yang dibimbing oleh Kak ${mentorName}`,
+        };
+    }
+    return { title: "", subtitle: "" };
+}
+
 type TodayStats = {
     date: string;
     month: string;
@@ -120,6 +133,7 @@ export default function DashboardContent() {
     const [stats, setStats] = useState<StatsData | null>(null);
     const [statsLoading, setStatsLoading] = useState(true);
     const [currentUser, setCurrentUser] = useState<{ _id: string; username: string; name: string; role: string } | null>(null);
+    const [mentorList, setMentorList] = useState<string[]>([]);
     const router = useRouter();
 
     // Auth check on mount
@@ -139,6 +153,22 @@ export default function DashboardContent() {
         };
         checkAuth();
     }, [router]);
+
+    // Fetch mentor list on mount
+    useEffect(() => {
+        const fetchMentors = async () => {
+            try {
+                const res = await apiFetch(endpoints.getMentorList);
+                const data = await res.json();
+                if (data.success) {
+                    setMentorList(data.mentors);
+                }
+            } catch (err) {
+                console.error("Failed to fetch mentor list", err);
+            }
+        };
+        fetchMentors();
+    }, []);
 
     const handleLogout = async () => {
         try {
@@ -211,12 +241,43 @@ export default function DashboardContent() {
         }
     };
 
+    // Build mentor nav items dynamically
+    const isSuperAdmin = currentUser?.role === "superadmin";
+    const mentorNavItems: { id: TabId; icon: React.ElementType; label: string; section?: string }[] = [];
+
+    if (isSuperAdmin) {
+        // Super admin sees all mentors
+        mentorList.forEach((mentor, idx) => {
+            mentorNavItems.push({
+                id: `mentor_${mentor}` as TabId,
+                icon: UserCog,
+                label: `${mentor}'s Mentees`,
+                ...(idx === 0 ? { section: "Personal" } : {}),
+            });
+        });
+    } else if (currentUser) {
+        // Regular admin sees only their own mentees
+        // Match current user's username against mentor list (case-insensitive)
+        const myMentorName = mentorList.find(
+            (m) => m.toLowerCase() === currentUser.username.toLowerCase()
+        );
+        if (myMentorName) {
+            mentorNavItems.push({
+                id: `mentor_${myMentorName}` as TabId,
+                icon: UserCog,
+                label: `${myMentorName}'s Mentees`,
+                section: "Personal",
+            });
+        }
+    }
+
     const navItems: { id: TabId; icon: React.ElementType; label: string; section?: string }[] = [
         { id: "all", icon: LayoutDashboard, label: "All Mentee Data", section: "Menu Utama" },
         { id: "sync", icon: RefreshCw, label: "Sync Airtable" },
         { id: "web", icon: Globe, label: "Web Development", section: "Program" },
         { id: "mobile", icon: Smartphone, label: "Mobile Development" },
         { id: "ai", icon: BrainCircuit, label: "AI Development" },
+        ...mentorNavItems,
         { id: "history", icon: History, label: "Riwayat Kehadiran", section: "Utilitas" },
         { id: "settings", icon: Settings, label: "Pengaturan Akun" },
     ];
@@ -380,6 +441,94 @@ export default function DashboardContent() {
         );
     };
 
+    // Reusable stat cards component for mentor-specific tabs
+    const MentorStatCards = ({ mentorName }: { mentorName: string }) => {
+        const [mStats, setMStats] = useState<StatsData | null>(null);
+        const [mLoading, setMLoading] = useState(true);
+
+        useEffect(() => {
+            const load = async () => {
+                setMLoading(true);
+                try {
+                    const res = await apiFetch(endpoints.getStatsByMentor(mentorName));
+                    const data = await res.json();
+                    if (data.success) {
+                        setMStats(data.stats);
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch mentor stats", err);
+                } finally {
+                    setMLoading(false);
+                }
+            };
+            load();
+        }, [mentorName]);
+
+        const today = mStats?.today;
+        const isLoading = mLoading;
+
+        return (
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+                <Card className="border-zinc-200/80 shadow-sm dark:border-zinc-800 hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 p-2">
+                                <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <Badge variant="secondary" className="text-[10px] bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400 border-0">
+                                Total
+                            </Badge>
+                        </div>
+                        <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
+                            {isLoading ? "..." : today?.totalMenteeBulanIni ?? 0}
+                        </div>
+                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                            Total mentee terdaftar bulan ini
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-zinc-200/80 shadow-sm dark:border-zinc-800 hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 p-2">
+                                <UserCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                            </div>
+                            <Badge variant="secondary" className="text-[10px] bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400 border-0">
+                                Hadir
+                            </Badge>
+                        </div>
+                        <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
+                            {isLoading ? "..." : today?.hadir ?? 0}
+                        </div>
+                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                            Mentee hadir hari ini (tgl {today?.date ?? "..."})
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-zinc-200/80 shadow-sm dark:border-zinc-800 hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="rounded-lg bg-red-50 dark:bg-red-950/30 p-2">
+                                <UserX className="h-4 w-4 text-red-600 dark:text-red-400" />
+                            </div>
+                            <Badge variant="secondary" className="text-[10px] bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400 border-0">
+                                Alpha
+                            </Badge>
+                        </div>
+                        <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
+                            {isLoading ? "..." : today?.alpha ?? 0}
+                        </div>
+                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                            Mentee alpha hari ini (tgl {today?.date ?? "..."})
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    };
+
     return (
         <div className="flex h-screen w-full bg-zinc-50/50 dark:bg-zinc-950 font-sans">
             {/* Desktop Sidebar */}
@@ -407,10 +556,10 @@ export default function DashboardContent() {
                         </Button>
                         <div>
                             <h2 className="font-semibold text-sm text-zinc-800 dark:text-zinc-200 leading-tight">
-                                {TAB_META[activeTab].title}
+                                {getTabMeta(activeTab).title}
                             </h2>
                             <p className="text-[11px] text-zinc-400 dark:text-zinc-500 hidden sm:block">
-                                {TAB_META[activeTab].subtitle}
+                                {getTabMeta(activeTab).subtitle}
                             </p>
                         </div>
                     </div>
@@ -820,6 +969,37 @@ export default function DashboardContent() {
                                 </Card>
                             </div>
                         )}
+
+                        {/* ===== MENTOR TABS (PERSONAL) ===== */}
+                        {activeTab.startsWith("mentor_") && (() => {
+                            const mentorName = activeTab.replace("mentor_", "");
+                            return (
+                                <div className="space-y-6 animate-in fade-in duration-300">
+                                    <div className="rounded-xl border border-amber-100 dark:border-amber-900/30 bg-gradient-to-r from-amber-50/80 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/10 p-5">
+                                        <div className="flex items-start gap-4">
+                                            <div className="rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 p-3 shadow-lg shadow-amber-500/20 shrink-0">
+                                                <UserCog className="h-5 w-5 text-white" />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm">
+                                                    Mentee Kak {mentorName}
+                                                </h3>
+                                                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
+                                                    Menampilkan data kehadiran khusus mentee yang dibimbing oleh Kak {mentorName}.
+                                                    Data difilter secara otomatis berdasarkan nama mentor.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <MentorStatCards mentorName={mentorName} />
+                                    <Card className="border-zinc-200/80 shadow-sm dark:border-zinc-800">
+                                        <CardContent className="pt-5">
+                                            <DataViewer defaultMentor={mentorName} hideFilter />
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            );
+                        })()}
 
                         {/* ===== HISTORY TAB ===== */}
                         {activeTab === "history" && <HistoryTab />}

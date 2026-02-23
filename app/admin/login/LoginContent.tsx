@@ -6,14 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Lock, User, KeyRound, Database, ArrowRight, AlertCircle } from "lucide-react";
+import { Lock, User, KeyRound, Database, ArrowRight, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { endpoints, apiFetch } from "@/lib/api";
+import Link from "next/link";
 
 export default function LoginContent() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -106,19 +108,29 @@ export default function LoginContent() {
                                     <KeyRound className="h-3 w-3 text-zinc-400" />
                                     Password
                                 </Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="Masukkan password Anda"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                    autoComplete="current-password"
-                                    className="h-10 bg-zinc-50/50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700 text-sm placeholder:text-zinc-400 focus-visible:ring-blue-500/50"
-                                />
+                                <div className="relative">
+                                    <Input
+                                        id="password"
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="Masukkan password Anda"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                        autoComplete="current-password"
+                                        className="h-10 pr-10 bg-zinc-50/50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700 text-sm placeholder:text-zinc-400 focus-visible:ring-blue-500/50"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                                        tabIndex={-1}
+                                    >
+                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
+                                </div>
                             </div>
                         </CardContent>
-                        <CardFooter className="flex flex-col gap-4 pb-6 pt-2">
+                        <CardFooter className="flex flex-col gap-4 pt-2">
                             <Button
                                 type="submit"
                                 className="w-full h-10 text-sm font-medium bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/30"
@@ -131,16 +143,21 @@ export default function LoginContent() {
                                     </span>
                                 ) : (
                                     <span className="flex items-center gap-2">
-                                        Masuk ke Dashboard
+                                        Login ke Dashboard
                                         <ArrowRight className="h-3.5 w-3.5" />
                                     </span>
                                 )}
                             </Button>
                             <div className="flex items-center gap-2 w-full">
                                 <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800"></div>
-                                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 shrink-0">Akses Terbatas</span>
+                                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 shrink-0">Kembali ke Home</span>
                                 <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800"></div>
                             </div>
+                            <Link href="/">
+                                <div className="underline text-sm">
+                                    Home
+                                </div>
+                            </Link>
                         </CardFooter>
                     </form>
                 </Card>
@@ -149,10 +166,10 @@ export default function LoginContent() {
                 <div className="flex flex-col items-center gap-1.5">
                     <div className="flex items-center gap-1.5 text-[10px] text-zinc-400 dark:text-zinc-600">
                         <Lock className="h-2.5 w-2.5" />
-                        <span>Area Khusus Personel Berwenang</span>
+                        <span>Mentor-Only Area</span>
                     </div>
                     <p className="text-[10px] text-zinc-300 dark:text-zinc-700">
-                        &copy; 2026 Admin Panel &middot; Absensi Management System
+                        &copy; 2026 Infinite Learning Indonesia &middot; Absensi Management System
                     </p>
                 </div>
             </div>

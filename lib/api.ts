@@ -24,6 +24,11 @@ export const endpoints = {
         const qs = params.toString();
         return `${API_BASE_URL}/admin/history${qs ? `?${qs}` : ""}`;
     },
+
+    // Mentor-specific (protected)
+    getMentorList: `${API_BASE_URL}/admin/mentors`,
+    getDataByMentor: (mentor: string, page: number) => `${API_BASE_URL}/admin/data/by-mentor?mentor=${encodeURIComponent(mentor)}&page=${page}&limit=10`,
+    getStatsByMentor: (mentor: string) => `${API_BASE_URL}/admin/stats/by-mentor?mentor=${encodeURIComponent(mentor)}`,
 };
 
 /**

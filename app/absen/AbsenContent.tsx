@@ -17,6 +17,7 @@ import {
     BookOpen,
     UserCheck,
     Clock,
+    FileWarning,
 } from "lucide-react";
 import {
     Card,
@@ -154,7 +155,7 @@ export default function AbsenContent() {
         { icon: Building2, label: "Institusi", value: currentData.institusi },
         { icon: BookOpen, label: "Program", value: currentData.programIL },
         { icon: GraduationCap, label: "Jenjang", value: currentData.jenjang },
-        { icon: UserCheck, label: "Mentor", value: currentData.mentor },
+        { icon: UserCheck, label: "Mentor", value: `Kak ${currentData.mentor}` },
     ];
 
     // Recalculate percentage: hadir / total ALL days (including belumDiisi)
@@ -338,6 +339,10 @@ export default function AbsenContent() {
                 <div className="flex items-center justify-center gap-2 rounded-xl bg-blue-50/50 px-4 py-2 text-blue-700 dark:bg-blue-900/10 dark:text-blue-300 border border-blue-100 dark:border-blue-900/20">
                     <Clock className="h-3.5 w-3.5" />
                     <p className="text-xs font-semibold">Absen diperbarui tiap jam 13.00 WIB di sesi pagi dan 22.00 WIB di sesi malam.</p>
+                </div>
+                <div className="flex items-center justify-center gap-2 rounded-xl bg-red-50/50 px-4 py-2 text-red-700 dark:bg-red-900/10 dark:text-red-300 border border-red-100 dark:border-red-900/20">
+                    <FileWarning className="h-3.5 w-3.5" />
+                    <p className="text-xs font-semibold">Absen tidak sesuai? <span className="underline">Ajukan banding</span> ke mentor personal kamu kak {currentData.mentor} <span className="underline">dengan bukti!</span> </p>
                 </div>
 
                 {/* Attendance Table */}

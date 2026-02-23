@@ -44,10 +44,11 @@ type MenteeData = {
 
 type DataViewerProps = {
     defaultProgram?: string;
+    defaultMentor?: string;
     hideFilter?: boolean;
 };
 
-export default function DataViewer({ defaultProgram, hideFilter }: DataViewerProps) {
+export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }: DataViewerProps) {
     const [data, setData] = useState<MenteeData[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -60,7 +61,11 @@ export default function DataViewer({ defaultProgram, hideFilter }: DataViewerPro
         const loadData = async () => {
             setLoading(true);
             try {
-                const res = await apiFetch(endpoints.getAllData(program === "All" ? "" : program, page));
+                // If filtering by mentor, use the mentor endpoint
+                const url = defaultMentor
+                    ? endpoints.getDataByMentor(defaultMentor, page)
+                    : endpoints.getAllData(program === "All" ? "" : program, page);
+                const res = await apiFetch(url);
                 const result = await res.json();
 
                 if (result.success) {
@@ -79,7 +84,7 @@ export default function DataViewer({ defaultProgram, hideFilter }: DataViewerPro
         };
 
         loadData();
-    }, [page, program]);
+    }, [page, program, defaultMentor]);
 
     const getPerformanceColor = (persen: number) => {
         if (persen >= 80) return { bg: "bg-emerald-500", text: "text-emerald-700 dark:text-emerald-400", badge: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400", label: "Baik" };
