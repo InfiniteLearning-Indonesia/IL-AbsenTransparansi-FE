@@ -19,6 +19,8 @@ import {
     Clock,
     FileWarning,
     Megaphone,
+    ExternalLink,
+    Shield,
 } from "lucide-react";
 import {
     Card,
@@ -207,7 +209,7 @@ export default function AbsenContent() {
         { label: "Hadir", value: currentData.summary.hadir, unit: "Sesi", color: "emerald" },
         { label: "Izin / Sakit", value: currentData.summary.izin, unit: "Sesi", color: "amber" },
         { label: "Alpha", value: currentData.summary.alpha, unit: "Sesi", color: "red" },
-        { label: "Persentase", value: `${recalcPersen}%`, unit: "Kehadiran", color: "blue" },
+        { label: "Persentase", value: `${recalcPersen}%`, unit: `Kehadiran bulan ${currentData.month}`, color: "blue" },
     ];
 
     const colorMap: Record<string, { bg: string; text: string; badge: string }> = {
@@ -274,81 +276,110 @@ export default function AbsenContent() {
         <div className="min-h-screen bg-zinc-50/50 font-sans dark:bg-zinc-950 relative">
             {/* Announcement Alert Dialog */}
             <AlertDialog open={announcementOpen}>
-                <AlertDialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
-                    <AlertDialogHeader>
-                        <AlertDialogTitle className="flex items-center gap-2 text-lg font-bold">
-                            <span className="inline-flex items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30 p-2">
-                                <Megaphone className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                            </span>
-                            📢 ANNOUNCEMENT
-                        </AlertDialogTitle>
-                        <AlertDialogDescription asChild>
-                            <div className="text-sm text-zinc-700 dark:text-zinc-300 space-y-3 mt-2 text-left">
-                                <p className="font-medium text-zinc-800 dark:text-zinc-200">
-                                    Dear teman-teman warga Infinite Learning,
-                                </p>
-                                <p>
-                                    Terkait absensi, berikut kami informasikan kembali ketentuannya:
-                                </p>
-                                <ul className="list-disc pl-5 space-y-2 text-[13px] leading-relaxed">
-                                    <li>
-                                        Batas keterlambatan adalah <strong>30 menit setelah ice-breaking selesai</strong>.
-                                    </li>
-                                    <li>
-                                        Jika ice-breaking selesai pukul 09.30, maka sistem absensi akan berjalan dari <strong>09.00–10.00</strong>.
-                                        <br />(Untuk sesi malam: <strong>19.00–20.00</strong>).
-                                    </li>
-                                    <li>
-                                        Melewati pukul <strong>10.00</strong> (atau <strong>20.00</strong> untuk sesi malam) akan <strong>dianggap Alpha</strong>, kecuali sudah melakukan konfirmasi sebelumnya (sebelum pukul 09.00 / 19.00 atau pada hari sebelumnya).
-                                    </li>
-                                    <li>
-                                        Jika keterlambatan tidak terhindarkan, wajib menginformasikan <strong>sebelum pukul 09.00 / 19.00</strong> bahwa Anda akan terlambat.
-                                    </li>
-                                    <li>
-                                        Selalu lakukan <strong>screenshot waktu kedatangan ke kelas</strong> sebagai bukti, terutama jika berpotensi terlambat.
-                                    </li>
-                                    <li>
-                                        Jika Anda hadir penuh tetapi terdeteksi Alpha oleh sistem AI, maka pengajuan banding akan <strong>otomatis diterima (auto accept)</strong> dan status diubah menjadi hadir.
-                                    </li>
-                                    <li>
-                                        Jika masuk setelah sesi absensi berakhir dan tidak mengabari sebelumnya, maka <strong>pengajuan banding berpotensi ditolak</strong>.
-                                    </li>
-                                    <li>
-                                        Sistem akan mencatat durasi peserta saat bergabung di Zoom untuk mencegah kecurangan dan sebagai bahan pertimbangan pengajuan banding; jika durasi lebih dari 30 menit maka banding dapat diterima, sedangkan jika kurang dari 30 menit maka dianggap kurang kuat.
-                                    </li>
-                                    <li>
-                                        Untuk perizinan (ketidakhadiran), wajib mengisi <strong>form izin sebelum pukul 09.00 / 19.00 atau sebelum kelas dimulai</strong>.
-                                    </li>
-                                    <li>
-                                        Form yang diisi setelah kelas dimulai, di tengah sesi, atau setelah jam absensi berakhir akan dianggap <strong>tidak valid (auto Alpha)</strong> dan tidak dapat diajukan banding.
-                                    </li>
-                                </ul>
-                                <p className="text-[13px] leading-relaxed mt-3">
-                                    Mohon dipahami bahwa sistem AI tetap memiliki kemungkinan kesalahan. Oleh karena itu, selalu siapkan bukti kehadiran dan hadirlah dengan penuh komitmen.
-                                </p>
-                                <p className="font-medium text-zinc-800 dark:text-zinc-200 mt-2">
-                                    Terima kasih atas perhatian dan kerja samanya. 👌
-                                </p>
+                <AlertDialogContent className="max-w-2xl max-h-[90vh] overflow-hidden p-0 rounded-2xl border-0 shadow-2xl">
+                    {/* Gradient Header */}
+                    <div className="bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 px-6 py-5 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.15)_75%,transparent_75%)] bg-[size:16px_16px] opacity-30" />
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+                        <div className="relative flex items-center gap-3">
+                            <div className="h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg shrink-0">
+                                <Megaphone className="h-6 w-6 text-white" />
                             </div>
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="mt-2">
-                        <AlertDialogAction
-                            disabled={countdown > 0}
-                            onClick={() => setAnnouncementOpen(false)}
-                            className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                        >
-                            {countdown > 0 ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    Mohon dibaca terlebih dahulu ({countdown}s)
-                                </span>
-                            ) : (
-                                <span className="flex items-center justify-center gap-2">
-                                    Mengerti ✅
-                                </span>
-                            )}
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
+                            <div>
+                                <h2 className="text-xl font-extrabold text-white tracking-tight">📢 Pengumuman Penting</h2>
+                                <p className="text-white/80 text-xs font-medium mt-0.5">Ketentuan Absensi — Wajib Dibaca</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Scrollable Content */}
+                    <div className="overflow-y-auto max-h-[55vh] px-6 py-5">
+                        <AlertDialogHeader className="p-0">
+                            <AlertDialogTitle className="sr-only">Pengumuman Ketentuan Absensi</AlertDialogTitle>
+                            <AlertDialogDescription asChild>
+                                <div className="space-y-4 text-left">
+                                    <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                                        Dear teman-teman warga <span className="font-bold text-zinc-900 dark:text-zinc-100">Infinite Learning</span>,
+                                        <br />Terkait absensi, berikut kami informasikan kembali ketentuannya:
+                                    </p>
+
+                                    <div className="space-y-2.5">
+                                        {[
+                                            <>Batas keterlambatan adalah <strong className="text-zinc-900 dark:text-zinc-100">30 menit setelah ice-breaking selesai</strong>.</>,
+                                            <>Jika ice-breaking selesai pukul 09.30, maka sistem absensi akan berjalan dari <strong className="text-zinc-900 dark:text-zinc-100">09.00–10.00</strong>. Untuk sesi malam: <strong className="text-zinc-900 dark:text-zinc-100">19.00–20.00</strong>.</>,
+                                            <>Melewati pukul <strong className="text-zinc-900 dark:text-zinc-100">10.00</strong> (atau <strong className="text-zinc-900 dark:text-zinc-100">20.00</strong> untuk sesi malam) akan <strong className="text-red-600 dark:text-red-400">dianggap Alpha</strong>, kecuali sudah melakukan konfirmasi sebelumnya (sebelum pukul 09.00 / 19.00 atau pada hari sebelumnya).</>,
+                                            <>Jika keterlambatan tidak terhindarkan, wajib menginformasikan <strong className="text-zinc-900 dark:text-zinc-100">sebelum pukul 09.00 / 19.00</strong> bahwa Anda akan terlambat.</>,
+                                            <>Selalu lakukan <strong className="text-zinc-900 dark:text-zinc-100">screenshot waktu kedatangan ke kelas</strong> sebagai bukti, terutama jika berpotensi terlambat.</>,
+                                            <>Jika Anda hadir penuh tetapi terdeteksi Alpha oleh sistem AI, maka pengajuan banding akan <strong className="text-emerald-600 dark:text-emerald-400">otomatis diterima (auto accept)</strong> dan status diubah menjadi hadir.</>,
+                                            <>Jika masuk setelah sesi absensi berakhir dan tidak mengabari sebelumnya, maka <strong className="text-red-600 dark:text-red-400">pengajuan banding berpotensi ditolak</strong>.</>,
+                                            <>Sistem akan mencatat durasi peserta saat bergabung di Zoom untuk mencegah kecurangan dan sebagai bahan pertimbangan pengajuan banding; jika durasi <strong className="text-emerald-600 dark:text-emerald-400">lebih dari 30 menit</strong> maka banding dapat diterima, sedangkan jika <strong className="text-red-600 dark:text-red-400">kurang dari 30 menit</strong> maka dianggap kurang kuat.</>,
+                                            <>Untuk perizinan (ketidakhadiran), wajib mengisi <strong className="text-zinc-900 dark:text-zinc-100">form izin sebelum pukul 09.00 / 19.00 atau sebelum kelas dimulai</strong>.</>,
+                                            <>Form yang diisi setelah kelas dimulai, di tengah sesi, atau setelah jam absensi berakhir akan dianggap <strong className="text-red-600 dark:text-red-400">tidak valid (auto Alpha)</strong> dan tidak dapat diajukan banding.</>,
+                                        ].map((item, i) => (
+                                            <div key={i} className="flex gap-3 items-start group">
+                                                <span className="shrink-0 mt-0.5 h-6 w-6 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 flex items-center justify-center text-[11px] font-extrabold text-amber-700 dark:text-amber-400 group-hover:scale-110 transition-transform">
+                                                    {i + 1}
+                                                </span>
+                                                <p className="text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+                                                    {item}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Note box */}
+                                    <div className="rounded-xl bg-blue-50/80 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 p-3.5 flex gap-3 items-start mt-4">
+                                        <Shield className="h-5 w-5 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" />
+                                        <p className="text-[12px] leading-relaxed text-blue-800 dark:text-blue-300">
+                                            Mohon dipahami bahwa sistem AI tetap memiliki kemungkinan kesalahan. Oleh karena itu, <strong>selalu siapkan bukti kehadiran</strong> dan hadirlah dengan penuh komitmen.
+                                        </p>
+                                    </div>
+
+                                    <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 pt-1">
+                                        Terima kasih atas perhatian dan kerja samanya. 👌
+                                    </p>
+                                </div>
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                    </div>
+
+                    {/* Footer with countdown */}
+                    <div className="px-6 pb-5 pt-2">
+                        {/* Countdown progress bar */}
+                        {countdown > 0 && (
+                            <div className="mb-3">
+                                <div className="h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                                    <div
+                                        className="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-1000 ease-linear"
+                                        style={{ width: `${((5 - countdown) / 5) * 100}%` }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                        <AlertDialogFooter className="p-0">
+                            <AlertDialogAction
+                                disabled={countdown > 0}
+                                onClick={() => setAnnouncementOpen(false)}
+                                className={`w-full rounded-xl h-11 text-sm font-bold shadow-lg transition-all duration-300 ${countdown > 0
+                                    ? "bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 cursor-not-allowed shadow-none"
+                                    : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white hover:shadow-emerald-500/25 hover:shadow-xl hover:-translate-y-0.5"
+                                    }`}
+                            >
+                                {countdown > 0 ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        Mohon dibaca terlebih dahulu ({countdown}s)
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <CheckCircle2 className="h-4 w-4" />
+                                        Mengerti ✅
+                                    </span>
+                                )}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </div>
                 </AlertDialogContent>
             </AlertDialog>
 
@@ -457,16 +488,36 @@ export default function AbsenContent() {
                     })}
                 </div>
 
-                {/* Announcement Re-open Button */}
-                <button
-                    onClick={handleOpenAnnouncement}
-                    className="w-full flex items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 px-4 py-3 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group"
-                >
-                    <span className="inline-flex items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/40 p-1.5 group-hover:scale-110 transition-transform">
-                        <Megaphone className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                    </span>
-                    <p className="text-xs font-bold">📢 Baca Pengumuman Ketentuan Absensi</p>
-                </button>
+                {/* Action Buttons: Announcement + Form Perizinan */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                        onClick={handleOpenAnnouncement}
+                        className="flex items-center gap-3 rounded-xl bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50 dark:from-amber-950/20 dark:via-orange-950/20 dark:to-amber-950/20 px-4 py-3.5 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/40 hover:shadow-lg hover:shadow-amber-500/10 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer group"
+                    >
+                        <span className="inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 p-2 shadow-md group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                            <Megaphone className="h-4 w-4 text-white" />
+                        </span>
+                        <div className="text-left">
+                            <p className="text-xs font-bold">📢 Pengumuman Absensi</p>
+                            <p className="text-[10px] font-medium text-amber-600/70 dark:text-amber-400/60 mt-0.5">Ketuk untuk membaca ketentuan</p>
+                        </div>
+                    </button>
+
+                    <a
+                        href="https://airtable.com/appoU770Y2bZLxCFL/shrrBhk9D26Cu3mpn"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 rounded-xl bg-gradient-to-br from-violet-50 via-purple-50 to-violet-50 dark:from-violet-950/20 dark:via-purple-950/20 dark:to-violet-950/20 px-4 py-3.5 text-violet-800 dark:text-violet-300 border border-violet-200/80 dark:border-violet-800/40 hover:shadow-lg hover:shadow-violet-500/10 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer group"
+                    >
+                        <span className="inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 p-2 shadow-md group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300">
+                            <ExternalLink className="h-4 w-4 text-white" />
+                        </span>
+                        <div className="text-left">
+                            <p className="text-xs font-bold">📝 Form Perizinan</p>
+                            <p className="text-[10px] font-medium text-violet-600/70 dark:text-violet-400/60 mt-0.5">Isi form izin ketidakhadiran</p>
+                        </div>
+                    </a>
+                </div>
 
                 <div className="flex items-center justify-center gap-2 rounded-xl bg-blue-50/50 px-4 py-2 text-blue-700 dark:bg-blue-900/10 dark:text-blue-300 border border-blue-100 dark:border-blue-900/20">
                     <Clock className="h-3.5 w-3.5" />
