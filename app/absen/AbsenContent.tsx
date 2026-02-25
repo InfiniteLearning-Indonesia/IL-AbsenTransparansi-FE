@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -18,6 +18,7 @@ import {
     UserCheck,
     Clock,
     FileWarning,
+    Megaphone,
 } from "lucide-react";
 import {
     Card,
@@ -32,6 +33,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { endpoints } from "@/lib/api";
 
 type AttendanceRecord = {
@@ -64,6 +74,37 @@ export default function AbsenContent() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [selectedMonth, setSelectedMonth] = useState<string>("");
+
+    // Announcement popup state
+    const [announcementOpen, setAnnouncementOpen] = useState(true);
+    const [countdown, setCountdown] = useState(5);
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+    const startCountdown = useCallback(() => {
+        setCountdown(5);
+        if (timerRef.current) clearInterval(timerRef.current);
+        timerRef.current = setInterval(() => {
+            setCountdown((prev) => {
+                if (prev <= 1) {
+                    if (timerRef.current) clearInterval(timerRef.current);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+    }, []);
+
+    useEffect(() => {
+        startCountdown();
+        return () => {
+            if (timerRef.current) clearInterval(timerRef.current);
+        };
+    }, [startCountdown]);
+
+    const handleOpenAnnouncement = () => {
+        setAnnouncementOpen(true);
+        startCountdown();
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -231,6 +272,86 @@ export default function AbsenContent() {
 
     return (
         <div className="min-h-screen bg-zinc-50/50 font-sans dark:bg-zinc-950 relative">
+            {/* Announcement Alert Dialog */}
+            <AlertDialog open={announcementOpen}>
+                <AlertDialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2 text-lg font-bold">
+                            <span className="inline-flex items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30 p-2">
+                                <Megaphone className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                            </span>
+                            📢 ANNOUNCEMENT
+                        </AlertDialogTitle>
+                        <AlertDialogDescription asChild>
+                            <div className="text-sm text-zinc-700 dark:text-zinc-300 space-y-3 mt-2 text-left">
+                                <p className="font-medium text-zinc-800 dark:text-zinc-200">
+                                    Dear teman-teman warga Infinite Learning,
+                                </p>
+                                <p>
+                                    Terkait absensi, berikut kami informasikan kembali ketentuannya:
+                                </p>
+                                <ul className="list-disc pl-5 space-y-2 text-[13px] leading-relaxed">
+                                    <li>
+                                        Batas keterlambatan adalah <strong>30 menit setelah ice-breaking selesai</strong>.
+                                    </li>
+                                    <li>
+                                        Jika ice-breaking selesai pukul 09.30, maka sistem absensi akan berjalan dari <strong>09.00–10.00</strong>.
+                                        <br />(Untuk sesi malam: <strong>19.00–20.00</strong>).
+                                    </li>
+                                    <li>
+                                        Melewati pukul <strong>10.00</strong> (atau <strong>20.00</strong> untuk sesi malam) akan <strong>dianggap Alpha</strong>, kecuali sudah melakukan konfirmasi sebelumnya (sebelum pukul 09.00 / 19.00 atau pada hari sebelumnya).
+                                    </li>
+                                    <li>
+                                        Jika keterlambatan tidak terhindarkan, wajib menginformasikan <strong>sebelum pukul 09.00 / 19.00</strong> bahwa Anda akan terlambat.
+                                    </li>
+                                    <li>
+                                        Selalu lakukan <strong>screenshot waktu kedatangan ke kelas</strong> sebagai bukti, terutama jika berpotensi terlambat.
+                                    </li>
+                                    <li>
+                                        Jika Anda hadir penuh tetapi terdeteksi Alpha oleh sistem AI, maka pengajuan banding akan <strong>otomatis diterima (auto accept)</strong> dan status diubah menjadi hadir.
+                                    </li>
+                                    <li>
+                                        Jika masuk setelah sesi absensi berakhir dan tidak mengabari sebelumnya, maka <strong>pengajuan banding berpotensi ditolak</strong>.
+                                    </li>
+                                    <li>
+                                        Sistem akan mencatat durasi peserta saat bergabung di Zoom untuk mencegah kecurangan dan sebagai bahan pertimbangan pengajuan banding; jika durasi lebih dari 30 menit maka banding dapat diterima, sedangkan jika kurang dari 30 menit maka dianggap kurang kuat.
+                                    </li>
+                                    <li>
+                                        Untuk perizinan (ketidakhadiran), wajib mengisi <strong>form izin sebelum pukul 09.00 / 19.00 atau sebelum kelas dimulai</strong>.
+                                    </li>
+                                    <li>
+                                        Form yang diisi setelah kelas dimulai, di tengah sesi, atau setelah jam absensi berakhir akan dianggap <strong>tidak valid (auto Alpha)</strong> dan tidak dapat diajukan banding.
+                                    </li>
+                                </ul>
+                                <p className="text-[13px] leading-relaxed mt-3">
+                                    Mohon dipahami bahwa sistem AI tetap memiliki kemungkinan kesalahan. Oleh karena itu, selalu siapkan bukti kehadiran dan hadirlah dengan penuh komitmen.
+                                </p>
+                                <p className="font-medium text-zinc-800 dark:text-zinc-200 mt-2">
+                                    Terima kasih atas perhatian dan kerja samanya. 👌
+                                </p>
+                            </div>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="mt-2">
+                        <AlertDialogAction
+                            disabled={countdown > 0}
+                            onClick={() => setAnnouncementOpen(false)}
+                            className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        >
+                            {countdown > 0 ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    Mohon dibaca terlebih dahulu ({countdown}s)
+                                </span>
+                            ) : (
+                                <span className="flex items-center justify-center gap-2">
+                                    Mengerti ✅
+                                </span>
+                            )}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             {/* Background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-100/30 rounded-full blur-[80px] dark:bg-blue-900/10" />
@@ -335,6 +456,17 @@ export default function AbsenContent() {
                         );
                     })}
                 </div>
+
+                {/* Announcement Re-open Button */}
+                <button
+                    onClick={handleOpenAnnouncement}
+                    className="w-full flex items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 px-4 py-3 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group"
+                >
+                    <span className="inline-flex items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/40 p-1.5 group-hover:scale-110 transition-transform">
+                        <Megaphone className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                    </span>
+                    <p className="text-xs font-bold">📢 Baca Pengumuman Ketentuan Absensi</p>
+                </button>
 
                 <div className="flex items-center justify-center gap-2 rounded-xl bg-blue-50/50 px-4 py-2 text-blue-700 dark:bg-blue-900/10 dark:text-blue-300 border border-blue-100 dark:border-blue-900/20">
                     <Clock className="h-3.5 w-3.5" />
