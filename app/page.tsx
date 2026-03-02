@@ -12,6 +12,16 @@ import {
   ArrowRight,
   Sparkles,
 } from "lucide-react";
+import { motion } from "framer-motion";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.5, ease: [0, 0, 0.2, 1] as const },
+  }),
+};
 
 export default function Home() {
   const [whatsapp, setWhatsapp] = useState("");
@@ -26,45 +36,49 @@ export default function Home() {
     }
   };
 
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 font-sans dark:bg-zinc-950 relative overflow-hidden">
-      {/* Background Decorations */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-20%] left-[-15%] w-[50%] h-[50%] bg-blue-200/30 rounded-full blur-[100px] dark:bg-blue-900/15 animate-pulse" style={{ animationDuration: "8s" }} />
-        <div className="absolute bottom-[-20%] right-[-15%] w-[50%] h-[50%] bg-indigo-200/30 rounded-full blur-[100px] dark:bg-indigo-900/15 animate-pulse" style={{ animationDuration: "10s" }} />
-        <div className="absolute top-[40%] left-[60%] w-[30%] h-[30%] bg-violet-200/20 rounded-full blur-[80px] dark:bg-violet-900/10" />
-        {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:60px_60px] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)]" />
+    <div className="flex min-h-screen items-center justify-center bg-[#FFFBFF] p-4 font-[var(--font-sans)] relative overflow-hidden">
+      {/* Background grid pattern */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(138,61,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(138,61,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
+        {/* Subtle accent blob */}
+        <div className="absolute top-[-15%] right-[-10%] w-[40%] h-[40%] bg-[#8a3dff]/5 blur-[100px]" />
+        <div className="absolute bottom-[-15%] left-[-10%] w-[35%] h-[35%] bg-[#ffcd29]/8 blur-[100px]" />
       </div>
 
       <div className="w-full max-w-lg z-10 space-y-6">
         {/* Main Card */}
-        <div className="rounded-2xl border border-zinc-200/80 bg-white/90 backdrop-blur-xl p-8 sm:p-10 shadow-xl shadow-zinc-200/50 dark:border-zinc-800 dark:bg-zinc-900/90 dark:shadow-black/30 transition-all">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          custom={0}
+          className="border border-[#e8e0f0] bg-white p-8 sm:p-10 shadow-sm card-hover"
+        >
           {/* Header */}
           <div className="space-y-4 text-center mb-8">
-            <div className="inline-flex items-center justify-center p-3.5 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25">
+            <motion.div variants={fadeUp} custom={1} className="inline-flex items-center justify-center p-3.5 bg-[#8a3dff] text-white shadow-lg shadow-[#8a3dff]/20">
               <ClipboardCheck className="h-7 w-7" />
-            </div>
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
-                Portal Absensi
+            </motion.div>
+            <motion.div variants={fadeUp} custom={2}>
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#191919] font-[var(--font-heading)]">
+                Portal <span className="accent-underline">Absensi</span>
               </h1>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 leading-relaxed max-w-sm mx-auto">
+              <p className="text-sm text-[#6b6b6b] mt-2 leading-relaxed max-w-sm mx-auto">
                 Pantau kehadiran dan performa belajar Anda selama ini. Masukkan nomor WhatsApp terdaftar untuk memulai.
               </p>
-            </div>
-            <div className="flex items-center justify-center gap-1.5">
-              <Sparkles className="h-3 w-3 text-amber-500" />
-              <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400">Infinite Learning Indonesia — Batch 10</span>
-              <Sparkles className="h-3 w-3 text-amber-500" />
-            </div>
+            </motion.div>
+            <motion.div variants={fadeUp} custom={3} className="flex items-center justify-center gap-1.5">
+              <Sparkles className="h-3 w-3 text-[#ffcd29]" />
+              <span className="text-[11px] font-medium text-[#8a3dff]">Infinite Learning Indonesia — Batch 10</span>
+              <Sparkles className="h-3 w-3 text-[#ffcd29]" />
+            </motion.div>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleCheck} className="space-y-5">
+          <motion.form variants={fadeUp} custom={4} onSubmit={handleCheck} className="space-y-5">
             <div className="space-y-2.5">
-              <Label htmlFor="whatsapp" className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+              <Label htmlFor="whatsapp" className="text-sm font-semibold text-[#191919]">
                 Nomor WhatsApp
               </Label>
               <div className="relative">
@@ -75,10 +89,10 @@ export default function Home() {
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
                   required
-                  className="h-12 pl-4 text-base rounded-xl border-zinc-200 bg-zinc-50/50 dark:border-zinc-700 dark:bg-zinc-800/50 transition-all focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                  className="h-12 pl-4 text-base border-[#e8e0f0] bg-[#f5f3f7]/50 transition-all focus:ring-2 focus:ring-[#8a3dff]/20 focus:border-[#8a3dff]"
                 />
               </div>
-              <p className="text-xs text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5">
+              <p className="text-xs text-[#6b6b6b] flex items-center gap-1.5">
                 <Info className="h-3 w-3 shrink-0" />
                 Pastikan nomor WA aktif dan sesuai dengan data pendaftaran. Gunakan format 08-nomor-anda.
               </p>
@@ -88,7 +102,7 @@ export default function Home() {
               type="submit"
               size="lg"
               disabled={loading}
-              className="h-12 w-full text-sm font-bold tracking-wide rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/30 hover:scale-[1.01] active:scale-[0.99]"
+              className="h-12 w-full text-sm font-bold tracking-wide bg-[#8a3dff] hover:bg-[#6b1fe0] text-white shadow-md shadow-[#8a3dff]/20 transition-all duration-300 hover:shadow-lg hover:shadow-[#8a3dff]/30 active:scale-[0.99]"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -102,15 +116,19 @@ export default function Home() {
                 </span>
               )}
             </Button>
-          </form>
-        </div>
-
-  
+          </motion.form>
+        </motion.div>
 
         {/* Footer */}
-        <div className="text-center text-[11px] text-zinc-400 dark:text-zinc-600">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          custom={5}
+          className="text-center text-[11px] text-[#6b6b6b]"
+        >
           &copy; {new Date().getFullYear()} Infinite Learning Indonesia. All rights reserved.
-        </div>
+        </motion.div>
       </div>
     </div>
   );

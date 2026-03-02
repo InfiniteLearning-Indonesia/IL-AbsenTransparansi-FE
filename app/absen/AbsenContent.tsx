@@ -45,6 +45,7 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { endpoints } from "@/lib/api";
+import { motion } from "framer-motion";
 
 type AttendanceRecord = {
     _id: string;
@@ -65,6 +66,15 @@ type AttendanceRecord = {
         persen: number;
     };
     __v?: number;
+};
+
+const fadeUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number) => ({
+        opacity: 1,
+        y: 0,
+        transition: { delay: i * 0.1, duration: 0.5, ease: [0, 0, 0.2, 1] as const },
+    }),
 };
 
 export default function AbsenContent() {
@@ -143,12 +153,12 @@ export default function AbsenContent() {
     // ─── Error / Edge States ───
     if (!whatsapp) {
         return (
-            <div className="flex min-h-screen flex-col items-center justify-center gap-5 bg-zinc-50 dark:bg-zinc-950 p-4">
-                <div className="rounded-full bg-red-50 dark:bg-red-950/30 p-4">
+            <div className="flex min-h-screen flex-col items-center justify-center gap-5 bg-[#FFFBFF] p-4">
+                <div className="bg-red-50 p-4">
                     <AlertCircle className="h-8 w-8 text-red-500" />
                 </div>
-                <p className="text-zinc-600 dark:text-zinc-400 font-medium">Nomor WhatsApp tidak ditemukan.</p>
-                <Button onClick={() => router.push("/")} className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md">
+                <p className="text-[#191919] font-medium">Nomor WhatsApp tidak ditemukan.</p>
+                <Button onClick={() => router.push("/")} className="bg-[#8a3dff] text-white shadow-md hover:bg-[#6b1fe0]">
                     <ArrowLeft className="h-4 w-4 mr-2" /> Kembali
                 </Button>
             </div>
@@ -157,15 +167,15 @@ export default function AbsenContent() {
 
     if (loading) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+            <div className="flex min-h-screen items-center justify-center bg-[#FFFBFF]">
                 <div className="flex flex-col items-center gap-4">
                     <div className="relative">
-                        <div className="h-12 w-12 rounded-full border-4 border-blue-100 dark:border-blue-900/30" />
-                        <Loader2 className="h-12 w-12 animate-spin text-blue-600 dark:text-blue-400 absolute inset-0" />
+                        <div className="h-12 w-12 border-4 border-[#e8e0f0]" />
+                        <Loader2 className="h-12 w-12 animate-spin text-[#8a3dff] absolute inset-0" />
                     </div>
                     <div className="text-center">
-                        <p className="font-semibold text-zinc-700 dark:text-zinc-300">Memuat Data</p>
-                        <p className="text-xs text-zinc-400 dark:text-zinc-500">Mengambil riwayat kehadiran Anda...</p>
+                        <p className="font-semibold text-[#191919]">Memuat Data</p>
+                        <p className="text-xs text-[#6b6b6b]">Mengambil riwayat kehadiran Anda...</p>
                     </div>
                 </div>
             </div>
@@ -174,15 +184,15 @@ export default function AbsenContent() {
 
     if (error || !currentData) {
         return (
-            <div className="flex min-h-screen flex-col items-center justify-center gap-5 bg-zinc-50 dark:bg-zinc-950 p-4">
-                <div className="rounded-full bg-red-50 dark:bg-red-950/30 p-4">
+            <div className="flex min-h-screen flex-col items-center justify-center gap-5 bg-[#FFFBFF] p-4">
+                <div className="bg-red-50 p-4">
                     <XCircle className="h-8 w-8 text-red-500" />
                 </div>
                 <div className="text-center">
-                    <p className="text-lg font-bold text-zinc-800 dark:text-zinc-200">{error || "Data tidak tersedia."}</p>
-                    <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">Pastikan nomor WhatsApp Anda benar dan terdaftar di sistem.</p>
+                    <p className="text-lg font-bold text-[#191919]">{error || "Data tidak tersedia."}</p>
+                    <p className="text-xs text-[#6b6b6b] mt-1">Pastikan nomor WhatsApp Anda benar dan terdaftar di sistem.</p>
                 </div>
-                <Button onClick={() => router.push("/")} className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md">
+                <Button onClick={() => router.push("/")} className="bg-[#8a3dff] text-white shadow-md hover:bg-[#6b1fe0]">
                     <ArrowLeft className="h-4 w-4 mr-2" /> Cari Kembali
                 </Button>
             </div>
@@ -209,29 +219,29 @@ export default function AbsenContent() {
         { label: "Hadir", value: currentData.summary.hadir, unit: "Sesi", color: "emerald" },
         { label: "Izin / Sakit", value: currentData.summary.izin, unit: "Sesi", color: "amber" },
         { label: "Alpha", value: currentData.summary.alpha, unit: "Sesi", color: "red" },
-        { label: "Persentase", value: `${recalcPersen}%`, unit: `Kehadiran bulan ${currentData.month}`, color: "blue" },
+        { label: "Persentase", value: `${recalcPersen}%`, unit: `Kehadiran bulan ${currentData.month}`, color: "purple" },
     ];
 
     const colorMap: Record<string, { bg: string; text: string; badge: string }> = {
         emerald: {
-            bg: "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/30",
-            text: "text-emerald-700 dark:text-emerald-300",
-            badge: "text-emerald-600 dark:text-emerald-400",
+            bg: "bg-emerald-50 border-emerald-100",
+            text: "text-emerald-700",
+            badge: "text-emerald-600",
         },
         amber: {
-            bg: "bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/30",
-            text: "text-amber-700 dark:text-amber-300",
-            badge: "text-amber-600 dark:text-amber-400",
+            bg: "bg-amber-50 border-amber-100",
+            text: "text-amber-700",
+            badge: "text-amber-600",
         },
         red: {
-            bg: "bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/30",
-            text: "text-red-700 dark:text-red-300",
-            badge: "text-red-600 dark:text-red-400",
+            bg: "bg-red-50 border-red-100",
+            text: "text-red-700",
+            badge: "text-red-600",
         },
-        blue: {
-            bg: "bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30",
-            text: "text-blue-700 dark:text-blue-300",
-            badge: "text-blue-600 dark:text-blue-400",
+        purple: {
+            bg: "bg-[#f3edff] border-[#e4d6ff]",
+            text: "text-[#8a3dff]",
+            badge: "text-[#8a3dff]",
         },
     };
 
@@ -239,7 +249,7 @@ export default function AbsenContent() {
         const s = status.toLowerCase().trim();
         if (s === "null") {
             return (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+                <span className="inline-flex items-center gap-1.5 bg-[#f5f3f7] px-2.5 py-1 text-xs font-semibold text-[#6b6b6b]">
                     <Clock className="h-3 w-3" />
                     Kelas belum dimulai
                 </span>
@@ -247,7 +257,7 @@ export default function AbsenContent() {
         }
         if (s.includes("hadir")) {
             return (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                <span className="inline-flex items-center gap-1.5 bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
                     <CheckCircle2 className="h-3 w-3" />
                     Hadir
                 </span>
@@ -255,7 +265,7 @@ export default function AbsenContent() {
         }
         if (s === "izin" || s.includes("sakit")) {
             return (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:text-amber-400">
+                <span className="inline-flex items-center gap-1.5 bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">
                     <AlertCircle className="h-3 w-3" />
                     {status}
                 </span>
@@ -263,31 +273,29 @@ export default function AbsenContent() {
         }
         if (s === "alpha") {
             return (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 dark:bg-red-900/30 px-2.5 py-1 text-xs font-semibold text-red-700 dark:text-red-400">
+                <span className="inline-flex items-center gap-1.5 bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">
                     <XCircle className="h-3 w-3" />
                     Alpha
                 </span>
             );
         }
-        return <span className="text-xs text-zinc-500">{status}</span>;
+        return <span className="text-xs text-[#6b6b6b]">{status}</span>;
     };
 
     return (
-        <div className="min-h-screen bg-zinc-50/50 font-sans dark:bg-zinc-950 relative">
+        <div className="min-h-screen bg-[#FFFBFF] font-[var(--font-sans)] relative">
             {/* Announcement Alert Dialog */}
             <AlertDialog open={announcementOpen}>
-                <AlertDialogContent className="max-w-2xl max-h-[90vh] overflow-hidden p-0 rounded-2xl border-0 shadow-2xl">
+                <AlertDialogContent className="max-w-2xl max-h-[90vh] overflow-hidden p-0 border border-[#e8e0f0] shadow-2xl">
                     {/* Gradient Header */}
-                    <div className="bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 px-6 py-5 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.15)_75%,transparent_75%)] bg-[size:16px_16px] opacity-30" />
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+                    <div className="bg-[#8a3dff] px-6 py-5 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.1)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0.1)_75%,transparent_75%)] bg-[size:16px_16px] opacity-30" />
                         <div className="relative flex items-center gap-3">
-                            <div className="h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg shrink-0">
+                            <div className="h-12 w-12 bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg shrink-0">
                                 <Megaphone className="h-6 w-6 text-white" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-extrabold text-white tracking-tight">📢 Pengumuman Penting</h2>
+                                <h2 className="text-xl font-extrabold text-white tracking-tight font-[var(--font-heading)]">📢 Pengumuman Penting</h2>
                                 <p className="text-white/80 text-xs font-medium mt-0.5">Ketentuan Absensi — Wajib Dibaca</p>
                             </div>
                         </div>
@@ -299,29 +307,29 @@ export default function AbsenContent() {
                             <AlertDialogTitle className="sr-only">Pengumuman Ketentuan Absensi</AlertDialogTitle>
                             <AlertDialogDescription asChild>
                                 <div className="space-y-4 text-left">
-                                    <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                                        Dear teman-teman warga <span className="font-bold text-zinc-900 dark:text-zinc-100">Infinite Learning</span>,
+                                    <p className="text-sm font-medium text-[#191919] leading-relaxed">
+                                        Dear teman-teman warga <span className="font-bold">Infinite Learning</span>,
                                         <br />Terkait absensi, berikut kami informasikan kembali ketentuannya:
                                     </p>
 
                                     <div className="space-y-2.5">
                                         {[
-                                            <>Batas keterlambatan adalah <strong className="text-zinc-900 dark:text-zinc-100">30 menit setelah ice-breaking selesai</strong>.</>,
-                                            <>Jika ice-breaking selesai pukul 09.30, maka sistem absensi akan berjalan dari <strong className="text-zinc-900 dark:text-zinc-100">09.00–10.00</strong>. Untuk sesi malam: <strong className="text-zinc-900 dark:text-zinc-100">19.00–20.00</strong>.</>,
-                                            <>Melewati pukul <strong className="text-zinc-900 dark:text-zinc-100">10.00</strong> (atau <strong className="text-zinc-900 dark:text-zinc-100">20.00</strong> untuk sesi malam) akan <strong className="text-red-600 dark:text-red-400">dianggap Alpha</strong>, kecuali sudah melakukan konfirmasi sebelumnya (sebelum pukul 09.00 / 19.00 atau pada hari sebelumnya).</>,
-                                            <>Jika keterlambatan tidak terhindarkan, wajib menginformasikan <strong className="text-zinc-900 dark:text-zinc-100">sebelum pukul 09.00 / 19.00</strong> bahwa Anda akan terlambat.</>,
-                                            <>Selalu lakukan <strong className="text-zinc-900 dark:text-zinc-100">screenshot waktu kedatangan ke kelas</strong> sebagai bukti, terutama jika berpotensi terlambat.</>,
-                                            <>Jika Anda hadir penuh tetapi terdeteksi Alpha oleh sistem AI, maka pengajuan banding akan <strong className="text-emerald-600 dark:text-emerald-400">otomatis diterima (auto accept)</strong> dan status diubah menjadi hadir.</>,
-                                            <>Jika masuk setelah sesi absensi berakhir dan tidak mengabari sebelumnya, maka <strong className="text-red-600 dark:text-red-400">pengajuan banding berpotensi ditolak</strong>.</>,
-                                            <>Sistem akan mencatat durasi peserta saat bergabung di Zoom untuk mencegah kecurangan dan sebagai bahan pertimbangan pengajuan banding; jika durasi <strong className="text-emerald-600 dark:text-emerald-400">lebih dari 30 menit</strong> maka banding dapat diterima, sedangkan jika <strong className="text-red-600 dark:text-red-400">kurang dari 30 menit</strong> maka dianggap kurang kuat.</>,
-                                            <>Untuk perizinan (ketidakhadiran), wajib mengisi <strong className="text-zinc-900 dark:text-zinc-100">form izin sebelum pukul 09.00 / 19.00 atau sebelum kelas dimulai</strong>.</>,
-                                            <>Form yang diisi setelah kelas dimulai, di tengah sesi, atau setelah jam absensi berakhir akan dianggap <strong className="text-red-600 dark:text-red-400">tidak valid (auto Alpha)</strong> dan tidak dapat diajukan banding.</>,
+                                            <>Batas keterlambatan adalah <strong>30 menit setelah ice-breaking selesai</strong>.</>,
+                                            <>Jika ice-breaking selesai pukul 09.30, maka sistem absensi akan berjalan dari <strong>09.00–10.00</strong>. Untuk sesi malam: <strong>19.00–20.00</strong>.</>,
+                                            <>Melewati pukul <strong>10.00</strong> (atau <strong>20.00</strong> untuk sesi malam) akan <strong className="text-red-600">dianggap Alpha</strong>, kecuali sudah melakukan konfirmasi sebelumnya (sebelum pukul 09.00 / 19.00 atau pada hari sebelumnya).</>,
+                                            <>Jika keterlambatan tidak terhindarkan, wajib menginformasikan <strong>sebelum pukul 09.00 / 19.00</strong> bahwa Anda akan terlambat.</>,
+                                            <>Selalu lakukan <strong>screenshot waktu kedatangan ke kelas</strong> sebagai bukti, terutama jika berpotensi terlambat.</>,
+                                            <>Jika Anda hadir penuh tetapi terdeteksi Alpha oleh sistem AI, maka pengajuan banding akan <strong className="text-emerald-600">otomatis diterima (auto accept)</strong> dan status diubah menjadi hadir.</>,
+                                            <>Jika masuk setelah sesi absensi berakhir dan tidak mengabari sebelumnya, maka <strong className="text-red-600">pengajuan banding berpotensi ditolak</strong>.</>,
+                                            <>Sistem akan mencatat durasi peserta saat bergabung di Zoom untuk mencegah kecurangan dan sebagai bahan pertimbangan pengajuan banding; jika durasi <strong className="text-emerald-600">lebih dari 30 menit</strong> maka banding dapat diterima, sedangkan jika <strong className="text-red-600">kurang dari 30 menit</strong> maka dianggap kurang kuat.</>,
+                                            <>Untuk perizinan (ketidakhadiran), wajib mengisi <strong>form izin sebelum pukul 09.00 / 19.00 atau sebelum kelas dimulai</strong>.</>,
+                                            <>Form yang diisi setelah kelas dimulai, di tengah sesi, atau setelah jam absensi berakhir akan dianggap <strong className="text-red-600">tidak valid (auto Alpha)</strong> dan tidak dapat diajukan banding.</>,
                                         ].map((item, i) => (
                                             <div key={i} className="flex gap-3 items-start group">
-                                                <span className="shrink-0 mt-0.5 h-6 w-6 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 flex items-center justify-center text-[11px] font-extrabold text-amber-700 dark:text-amber-400 group-hover:scale-110 transition-transform">
+                                                <span className="shrink-0 mt-0.5 h-6 w-6 bg-[#f3edff] flex items-center justify-center text-[11px] font-extrabold text-[#8a3dff] group-hover:bg-[#8a3dff] group-hover:text-white transition-all duration-300">
                                                     {i + 1}
                                                 </span>
-                                                <p className="text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+                                                <p className="text-[13px] leading-relaxed text-[#4a4a4a]">
                                                     {item}
                                                 </p>
                                             </div>
@@ -329,14 +337,14 @@ export default function AbsenContent() {
                                     </div>
 
                                     {/* Note box */}
-                                    <div className="rounded-xl bg-blue-50/80 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 p-3.5 flex gap-3 items-start mt-4">
-                                        <Shield className="h-5 w-5 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" />
-                                        <p className="text-[12px] leading-relaxed text-blue-800 dark:text-blue-300">
+                                    <div className="bg-[#f3edff] border border-[#e4d6ff] p-3.5 flex gap-3 items-start mt-4">
+                                        <Shield className="h-5 w-5 text-[#8a3dff] shrink-0 mt-0.5" />
+                                        <p className="text-[12px] leading-relaxed text-[#5a1dbf]">
                                             Mohon dipahami bahwa sistem AI tetap memiliki kemungkinan kesalahan. Oleh karena itu, <strong>selalu siapkan bukti kehadiran</strong> dan hadirlah dengan penuh komitmen.
                                         </p>
                                     </div>
 
-                                    <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 pt-1">
+                                    <p className="text-sm font-semibold text-[#191919] pt-1">
                                         Terima kasih atas perhatian dan kerja samanya. 👌
                                     </p>
                                 </div>
@@ -349,9 +357,9 @@ export default function AbsenContent() {
                         {/* Countdown progress bar */}
                         {countdown > 0 && (
                             <div className="mb-3">
-                                <div className="h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                                <div className="h-1.5 w-full bg-[#f5f3f7] overflow-hidden">
                                     <div
-                                        className="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-1000 ease-linear"
+                                        className="h-full bg-[#8a3dff] transition-all duration-1000 ease-linear"
                                         style={{ width: `${((5 - countdown) / 5) * 100}%` }}
                                     />
                                 </div>
@@ -361,9 +369,9 @@ export default function AbsenContent() {
                             <AlertDialogAction
                                 disabled={countdown > 0}
                                 onClick={() => setAnnouncementOpen(false)}
-                                className={`w-full rounded-xl h-11 text-sm font-bold shadow-lg transition-all duration-300 ${countdown > 0
-                                    ? "bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 cursor-not-allowed shadow-none"
-                                    : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white hover:shadow-emerald-500/25 hover:shadow-xl hover:-translate-y-0.5"
+                                className={`w-full h-11 text-sm font-bold shadow-lg transition-all duration-300 ${countdown > 0
+                                    ? "bg-[#f5f3f7] text-[#999] cursor-not-allowed shadow-none"
+                                    : "bg-emerald-500 hover:bg-emerald-600 text-white hover:shadow-emerald-500/25 hover:shadow-xl"
                                     }`}
                             >
                                 {countdown > 0 ? (
@@ -385,35 +393,40 @@ export default function AbsenContent() {
 
             {/* Background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-100/30 rounded-full blur-[80px] dark:bg-blue-900/10" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[35%] h-[35%] bg-indigo-100/30 rounded-full blur-[80px] dark:bg-indigo-900/10" />
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(138,61,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(138,61,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
+                <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#8a3dff]/5 blur-[80px]" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[35%] h-[35%] bg-[#ffcd29]/8 blur-[80px]" />
             </div>
 
-            <div className="relative mx-auto max-w-4xl p-4 sm:p-6 space-y-6">
+            <motion.div
+                initial="hidden"
+                animate="visible"
+                className="relative mx-auto max-w-4xl p-4 sm:p-6 space-y-6"
+            >
                 {/* Header */}
-                <div className="flex items-center justify-between">
+                <motion.div variants={fadeUp} custom={0} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Button
                             variant="outline"
                             size="icon"
                             onClick={() => router.push("/")}
-                            className="rounded-xl h-9 w-9 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                            className="h-9 w-9 border-[#e8e0f0] hover:bg-[#f5f3f7] hover:border-[#8a3dff] transition-colors"
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
                         <div>
-                            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-                                Detail Absensi
+                            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-[#191919] font-[var(--font-heading)]">
+                                Detail <span className="accent-underline">Absensi</span>
                             </h1>
-                            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 hidden sm:block">
+                            <p className="text-[11px] text-[#6b6b6b] hidden sm:block">
                                 Riwayat kehadiran mentee
                             </p>
                         </div>
                     </div>
 
                     <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                        <SelectTrigger className="w-[140px] h-9 rounded-xl text-sm border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
-                            <Calendar className="h-3.5 w-3.5 mr-1.5 text-zinc-400" />
+                        <SelectTrigger className="w-[140px] h-9 text-sm border-[#e8e0f0] bg-white hover:border-[#8a3dff] transition-colors">
+                            <Calendar className="h-3.5 w-3.5 mr-1.5 text-[#8a3dff]" />
                             <SelectValue placeholder="Pilih Bulan" />
                         </SelectTrigger>
                         <SelectContent>
@@ -424,19 +437,19 @@ export default function AbsenContent() {
                             ))}
                         </SelectContent>
                     </Select>
-                </div>
+                </motion.div>
 
                 {/* Profile Banner */}
-                <div className="rounded-2xl border border-zinc-200/80 bg-white/90 backdrop-blur-sm shadow-sm overflow-hidden dark:border-zinc-800 dark:bg-zinc-900/90">
+                <motion.div variants={fadeUp} custom={1} className="border border-[#e8e0f0] bg-white shadow-sm overflow-hidden card-hover">
                     {/* Gradient Header */}
-                    <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 p-6 sm:p-8 text-white relative overflow-hidden">
-                        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.1)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0.1)_75%,transparent_75%)] bg-[size:20px_20px] opacity-30" />
+                    <div className="bg-[#8a3dff] p-6 sm:p-8 text-white relative overflow-hidden">
+                        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.08)_50%,rgba(255,255,255,0.08)_75%,transparent_75%)] bg-[size:20px_20px] opacity-50" />
                         <div className="relative flex flex-col sm:flex-row sm:items-center gap-4">
-                            <div className="h-14 w-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white font-black text-xl shadow-lg shrink-0">
+                            <div className="h-14 w-14 bg-white/20 backdrop-blur-sm flex items-center justify-center text-white font-black text-xl shadow-lg shrink-0">
                                 {currentData.name.charAt(0).toUpperCase()}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight truncate">
+                                <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight truncate font-[var(--font-heading)]">
                                     {currentData.name}
                                 </h2>
                                 <p className="text-sm text-white/80 font-medium mt-0.5">
@@ -458,27 +471,27 @@ export default function AbsenContent() {
                     {/* Profile Details */}
                     <div className="p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {profileFields.map((f) => (
-                            <div key={f.label} className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-800/30 border border-zinc-100 dark:border-zinc-800">
-                                <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 p-2 shrink-0">
-                                    <f.icon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            <div key={f.label} className="flex items-center gap-3 p-3 bg-[#f5f3f7]/50 border border-[#e8e0f0] hover:border-[#8a3dff] transition-colors duration-300">
+                                <div className="bg-[#f3edff] p-2 shrink-0">
+                                    <f.icon className="h-4 w-4 text-[#8a3dff]" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-[10px] uppercase tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">{f.label}</p>
-                                    <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate">{f.value}</p>
+                                    <p className="text-[10px] uppercase tracking-wider font-semibold text-[#999]">{f.label}</p>
+                                    <p className="text-sm font-bold text-[#191919] truncate">{f.value}</p>
                                 </div>
                             </div>
                         ))}
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Stat Cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <motion.div variants={fadeUp} custom={2} className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {statCards.map((s) => {
                         const c = colorMap[s.color];
                         return (
                             <div
                                 key={s.label}
-                                className={`rounded-xl border p-4 text-center ${c.bg} hover:shadow-md transition-all hover:-translate-y-0.5`}
+                                className={`border p-4 text-center ${c.bg} hover:shadow-md transition-all duration-300 card-hover`}
                             >
                                 <p className={`text-[10px] font-bold uppercase tracking-wider ${c.badge} mb-1`}>{s.label}</p>
                                 <p className={`text-2xl sm:text-3xl font-black ${c.text}`}>{s.value}</p>
@@ -486,20 +499,20 @@ export default function AbsenContent() {
                             </div>
                         );
                     })}
-                </div>
+                </motion.div>
 
                 {/* Action Buttons: Announcement + Form Perizinan */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <motion.div variants={fadeUp} custom={3} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button
                         onClick={handleOpenAnnouncement}
-                        className="flex items-center gap-3 rounded-xl bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50 dark:from-amber-950/20 dark:via-orange-950/20 dark:to-amber-950/20 px-4 py-3.5 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/40 hover:shadow-lg hover:shadow-amber-500/10 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer group"
+                        className="flex items-center gap-3 bg-[#ffcd29]/10 px-4 py-3.5 text-[#191919] border border-[#ffcd29]/30 hover:border-[#ffcd29] hover:shadow-lg hover:shadow-[#ffcd29]/10 transition-all duration-300 cursor-pointer group"
                     >
-                        <span className="inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 p-2 shadow-md group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                            <Megaphone className="h-4 w-4 text-white" />
+                        <span className="inline-flex items-center justify-center bg-[#ffcd29] p-2 shadow-md group-hover:scale-110 transition-all duration-300">
+                            <Megaphone className="h-4 w-4 text-[#191919]" />
                         </span>
                         <div className="text-left">
                             <p className="text-xs font-bold">📢 Pengumuman Absensi</p>
-                            <p className="text-[10px] font-medium text-amber-600/70 dark:text-amber-400/60 mt-0.5">Ketuk untuk membaca ketentuan</p>
+                            <p className="text-[10px] font-medium text-[#6b6b6b] mt-0.5">Ketuk untuk membaca ketentuan</p>
                         </div>
                     </button>
 
@@ -507,79 +520,83 @@ export default function AbsenContent() {
                         href="https://airtable.com/appoU770Y2bZLxCFL/shrrBhk9D26Cu3mpn"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-3 rounded-xl bg-gradient-to-br from-violet-50 via-purple-50 to-violet-50 dark:from-violet-950/20 dark:via-purple-950/20 dark:to-violet-950/20 px-4 py-3.5 text-violet-800 dark:text-violet-300 border border-violet-200/80 dark:border-violet-800/40 hover:shadow-lg hover:shadow-violet-500/10 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer group"
+                        className="flex items-center gap-3 bg-[#f3edff] px-4 py-3.5 text-[#191919] border border-[#e4d6ff] hover:border-[#8a3dff] hover:shadow-lg hover:shadow-[#8a3dff]/10 transition-all duration-300 cursor-pointer group"
                     >
-                        <span className="inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 p-2 shadow-md group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300">
+                        <span className="inline-flex items-center justify-center bg-[#8a3dff] p-2 shadow-md group-hover:scale-110 transition-all duration-300">
                             <ExternalLink className="h-4 w-4 text-white" />
                         </span>
                         <div className="text-left">
                             <p className="text-xs font-bold">📝 Form Perizinan</p>
-                            <p className="text-[10px] font-medium text-violet-600/70 dark:text-violet-400/60 mt-0.5">Isi form izin ketidakhadiran (Ingat! Sebelum 09.00 / 19.00!)</p>
+                            <p className="text-[10px] font-medium text-[#6b6b6b] mt-0.5">Isi form izin ketidakhadiran (Ingat! Sebelum 09.00 / 19.00!)</p>
                         </div>
                     </a>
-                </div>
+                </motion.div>
 
-                <div className="flex items-center justify-center gap-2 rounded-xl bg-blue-50/50 px-4 py-2 text-blue-700 dark:bg-blue-900/10 dark:text-blue-300 border border-blue-100 dark:border-blue-900/20">
-                    <Clock className="h-3.5 w-3.5" />
-                    <p className="text-xs font-semibold">Absen diperbarui tiap jam 13.00 WIB di sesi pagi dan 22.00 WIB di sesi malam.</p>
-                </div>
-                <div className="flex items-center justify-center gap-2 rounded-xl bg-red-50/50 px-4 py-2 text-red-700 dark:bg-red-900/10 dark:text-red-300 border border-red-100 dark:border-red-900/20">
-                    <FileWarning className="h-3.5 w-3.5" />
-                    <p className="text-xs font-semibold">Absen tidak sesuai? <span className="underline">Ajukan banding</span> ke mentor personal kamu kak {currentData.mentor} <span className="underline">dengan bukti!</span> </p>
-                </div>
+                <motion.div variants={fadeUp} custom={4} className="space-y-3">
+                    <div className="flex items-center justify-center gap-2 bg-[#f3edff] px-4 py-2 text-[#5a1dbf] border border-[#e4d6ff]">
+                        <Clock className="h-3.5 w-3.5" />
+                        <p className="text-xs font-semibold">Absen diperbarui tiap jam 13.00 WIB di sesi pagi dan 22.00 WIB di sesi malam.</p>
+                    </div>
+                    <div className="flex items-center justify-center gap-2 bg-red-50 px-4 py-2 text-red-700 border border-red-100">
+                        <FileWarning className="h-3.5 w-3.5" />
+                        <p className="text-xs font-semibold">Absen tidak sesuai? <span className="accent-underline">Ajukan banding</span> ke mentor personal kamu kak {currentData.mentor} <span className="accent-underline">dengan bukti!</span> </p>
+                    </div>
+                </motion.div>
 
                 {/* Attendance Table */}
-                <Card className="border-zinc-200/80 dark:border-zinc-800 shadow-sm rounded-2xl overflow-hidden">
-                    <CardHeader className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 pb-4">
-                        <div className="flex items-center gap-2.5">
-                            <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 p-2">
-                                <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <motion.div variants={fadeUp} custom={5}>
+                    <Card className="border-[#e8e0f0] shadow-sm overflow-hidden card-hover">
+                        <CardHeader className="border-b border-[#e8e0f0] bg-[#f5f3f7]/50 pb-4">
+                            <div className="flex items-center gap-2.5">
+                                <div className="bg-[#f3edff] p-2">
+                                    <Calendar className="h-4 w-4 text-[#8a3dff]" />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-sm font-bold font-[var(--font-heading)]">Riwayat Kehadiran</CardTitle>
+                                    <p className="text-[11px] text-[#6b6b6b]">Bulan {selectedMonth} 2026</p>
+                                </div>
+                                <Badge variant="secondary" className="ml-auto text-[10px] bg-[#f3edff] text-[#8a3dff] border-0">
+                                    {attendanceEntries.length} hari
+                                </Badge>
                             </div>
-                            <div>
-                                <CardTitle className="text-sm font-bold">Riwayat Kehadiran</CardTitle>
-                                <p className="text-[11px] text-zinc-400 dark:text-zinc-500">Bulan {selectedMonth} 2026</p>
-                            </div>
-                            <Badge variant="secondary" className="ml-auto text-[10px]">
-                                {attendanceEntries.length} hari
-                            </Badge>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                        {attendanceEntries.length > 0 ? (
-                            <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                                {attendanceEntries.map(([date, status]) => (
-                                    <div
-                                        key={date}
-                                        className="flex items-center justify-between px-5 py-3 hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30 transition-colors"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-8 w-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-300">
-                                                {date}
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            {attendanceEntries.length > 0 ? (
+                                <div className="divide-y divide-[#e8e0f0]">
+                                    {attendanceEntries.map(([date, status]) => (
+                                        <div
+                                            key={date}
+                                            className="flex items-center justify-between px-5 py-3 hover:bg-[#f5f3f7]/50 transition-colors"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 bg-[#f5f3f7] flex items-center justify-center text-xs font-bold text-[#191919]">
+                                                    {date}
+                                                </div>
+                                                <span className="text-sm text-[#6b6b6b] hidden sm:inline">
+                                                    {selectedMonth} {date}, 2026
+                                                </span>
                                             </div>
-                                            <span className="text-sm text-zinc-500 dark:text-zinc-400 hidden sm:inline">
-                                                {selectedMonth} {date}, 2026
-                                            </span>
+                                            {getStatusBadge(status)}
                                         </div>
-                                        {getStatusBadge(status)}
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center py-16 text-center">
-                                <User className="h-10 w-10 text-zinc-300 dark:text-zinc-600 mb-3" />
-                                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                                    Belum ada data absensi untuk bulan ini.
-                                </p>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center py-16 text-center">
+                                    <User className="h-10 w-10 text-[#ccc] mb-3" />
+                                    <p className="text-sm text-[#6b6b6b]">
+                                        Belum ada data absensi untuk bulan ini.
+                                    </p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </motion.div>
 
                 {/* Footer */}
-                <div className="text-center text-[11px] text-zinc-400 dark:text-zinc-600 pb-4">
+                <motion.div variants={fadeUp} custom={6} className="text-center text-[11px] text-[#999] pb-4">
                     &copy; {new Date().getFullYear()} Infinite Learning Indonesia. All rights reserved.
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
         </div>
     );
 }

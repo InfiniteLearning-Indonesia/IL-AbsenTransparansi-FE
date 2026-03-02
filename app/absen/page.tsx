@@ -5,10 +5,10 @@ export default function AbsenPage() {
     return (
         <Suspense
             fallback={
-                <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+                <div className="flex min-h-screen items-center justify-center bg-[#FFFBFF]">
                     <div className="flex flex-col items-center gap-4">
-                        <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600 dark:border-blue-900 dark:border-t-blue-400" />
-                        <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium">Memuat halaman...</p>
+                        <div className="h-10 w-10 animate-spin border-4 border-[#e4d6ff] border-t-[#8a3dff]" />
+                        <p className="text-sm text-[#6b6b6b] font-medium">Memuat halaman...</p>
                     </div>
                 </div>
             }

@@ -7,10 +7,9 @@ const lexendDeca = Lexend_Deca({
   subsets: ["latin"],
 });
 
-
 export const metadata: Metadata = {
   title: "Absensi Tools - Infinite Learning",
-  description: "Absensi Tools",
+  description: "Sistem Manajemen Absensi Mentee — Infinite Learning Indonesia",
 };
 
 export default function RootLayout({
@@ -21,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${lexendDeca.variable} antialiased`}
+        className={`${lexendDeca.variable} ${lexendDeca.className} antialiased`}
       >
         {children}
       </body>

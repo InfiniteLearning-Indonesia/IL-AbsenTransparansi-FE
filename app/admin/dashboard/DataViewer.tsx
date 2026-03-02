@@ -95,9 +95,9 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
     }, [page, program, month, defaultMentor]);
 
     const getPerformanceColor = (persen: number) => {
-        if (persen >= 80) return { bg: "bg-emerald-500", text: "text-emerald-700 dark:text-emerald-400", badge: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400", label: "Baik" };
-        if (persen >= 60) return { bg: "bg-amber-500", text: "text-amber-700 dark:text-amber-400", badge: "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400", label: "Cukup" };
-        return { bg: "bg-red-500", text: "text-red-700 dark:text-red-400", badge: "bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400", label: "Kurang" };
+        if (persen >= 80) return { bg: "bg-emerald-500", text: "text-emerald-700", badge: "bg-emerald-50 text-emerald-700", label: "Baik" };
+        if (persen >= 60) return { bg: "bg-amber-500", text: "text-amber-700", badge: "bg-amber-50 text-amber-700", label: "Cukup" };
+        return { bg: "bg-red-500", text: "text-red-700", badge: "bg-red-50 text-red-700", label: "Kurang" };
     };
 
     return (
@@ -105,11 +105,11 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
             {/* Header Row */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                    <h2 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                    <h2 className="text-sm font-semibold text-[#191919] font-[var(--font-heading)]">
                         {defaultProgram ? `Mentee ${defaultProgram}` : "Semua Mentee"}
                     </h2>
                     {!loading && (
-                        <Badge variant="secondary" className="text-[10px] font-normal bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
+                        <Badge variant="secondary" className="text-[10px] font-normal bg-[#f3edff] text-[#8a3dff] border-0">
                             {totalRecords} data
                         </Badge>
                     )}
@@ -118,20 +118,20 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                 <div className="flex items-center gap-2">
                     {/* Month Filter - always shown */}
                     <Select value={month} onValueChange={(val) => { setMonth(val); setPage(1); }}>
-                        <SelectTrigger className="w-[130px] h-8 text-xs bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700">
+                        <SelectTrigger className="w-[130px] h-8 text-xs bg-white border-[#e8e0f0] hover:border-[#8a3dff] transition-colors">
                             <SelectValue placeholder="Filter Bulan" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="All">
                                 <span className="flex items-center gap-2">
-                                    <CalendarDays className="h-3 w-3 text-zinc-400" />
+                                    <CalendarDays className="h-3 w-3 text-[#8a3dff]" />
                                     Semua Bulan
                                 </span>
                             </SelectItem>
                             {(monthsList.length > 0 ? monthsList : monthNames).map((m) => (
                                 <SelectItem key={m} value={m}>
                                     <span className="flex items-center gap-2">
-                                        <CalendarDays className="h-3 w-3 text-zinc-400" />
+                                        <CalendarDays className="h-3 w-3 text-[#8a3dff]" />
                                         {m}
                                     </span>
                                 </SelectItem>
@@ -142,20 +142,20 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                     {/* Program Filter - shown when hideFilter is false */}
                     {!hideFilter && (
                         <Select value={program} onValueChange={(val) => { setProgram(val); setPage(1); }}>
-                            <SelectTrigger className="w-[180px] h-8 text-xs bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700">
+                            <SelectTrigger className="w-[180px] h-8 text-xs bg-white border-[#e8e0f0] hover:border-[#8a3dff] transition-colors">
                                 <SelectValue placeholder="Filter Program" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="All">
                                     <span className="flex items-center gap-2">
-                                        <Users className="h-3 w-3 text-zinc-400" />
+                                        <Users className="h-3 w-3 text-[#8a3dff]" />
                                         Semua Program
                                     </span>
                                 </SelectItem>
                                 {programsList.map((p) => (
                                     <SelectItem key={p} value={p}>
                                         <span className="flex items-center gap-2">
-                                            <Building2 className="h-3 w-3 text-zinc-400" />
+                                            <Building2 className="h-3 w-3 text-[#8a3dff]" />
                                             {p}
                                         </span>
                                     </SelectItem>
@@ -167,23 +167,23 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
             </div>
 
             {/* Table */}
-            <div className="rounded-lg border border-zinc-200/80 shadow-sm overflow-hidden bg-white dark:bg-zinc-900 dark:border-zinc-800">
+            <div className="border border-[#e8e0f0] shadow-sm overflow-hidden bg-white">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-zinc-50/80 dark:bg-zinc-900/80 hover:bg-zinc-50/80">
-                            <TableHead className="w-[250px] text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                        <TableRow className="bg-[#f5f3f7]/50 hover:bg-[#f5f3f7]/50">
+                            <TableHead className="w-[250px] text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider">
                                 Informasi Mentee
                             </TableHead>
-                            <TableHead className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                            <TableHead className="text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider">
                                 Program
                             </TableHead>
-                            <TableHead className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                            <TableHead className="text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider">
                                 Periode
                             </TableHead>
-                            <TableHead className="w-[200px] text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                            <TableHead className="w-[200px] text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider">
                                 Tingkat Kehadiran
                             </TableHead>
-                            <TableHead className="text-right text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                            <TableHead className="text-right text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider">
                                 Detail (H / I / A)
                             </TableHead>
                         </TableRow>
@@ -193,12 +193,12 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                             <TableRow>
                                 <TableCell colSpan={5} className="h-48 text-center">
                                     <div className="flex flex-col items-center justify-center gap-3 text-muted-foreground py-8">
-                                        <div className="rounded-full bg-blue-50 dark:bg-blue-950/30 p-3">
-                                            <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                                        <div className="bg-[#f3edff] p-3">
+                                            <Loader2 className="h-5 w-5 animate-spin text-[#8a3dff]" />
                                         </div>
                                         <div className="text-center">
-                                            <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Memuat data...</p>
-                                            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">Mengambil data mentee terbaru dari database</p>
+                                            <p className="text-sm font-medium text-[#191919]">Memuat data...</p>
+                                            <p className="text-xs text-[#6b6b6b] mt-0.5">Mengambil data mentee terbaru dari database</p>
                                         </div>
                                     </div>
                                 </TableCell>
@@ -207,12 +207,12 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                             <TableRow>
                                 <TableCell colSpan={5} className="h-48 text-center">
                                     <div className="flex flex-col items-center justify-center gap-3 py-8">
-                                        <div className="rounded-full bg-zinc-100 dark:bg-zinc-800 p-3">
-                                            <Users className="h-5 w-5 text-zinc-400" />
+                                        <div className="bg-[#f5f3f7] p-3">
+                                            <Users className="h-5 w-5 text-[#999]" />
                                         </div>
                                         <div className="text-center">
-                                            <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Data Tidak Ditemukan</p>
-                                            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
+                                            <p className="text-sm font-medium text-[#191919]">Data Tidak Ditemukan</p>
+                                            <p className="text-xs text-[#6b6b6b] mt-0.5">
                                                 Tidak ada data mentee untuk filter yang dipilih.
                                                 {" Coba ubah filter bulan"}{!hideFilter && " atau program"}.
                                             </p>
@@ -226,18 +226,18 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                                 return (
                                     <TableRow
                                         key={item._id}
-                                        className="group hover:bg-blue-50/30 dark:hover:bg-blue-950/10 transition-colors duration-150"
+                                        className="group hover:bg-[#f3edff]/30 transition-colors duration-150"
                                     >
                                         <TableCell className="py-3">
                                             <div className="flex items-center gap-3">
-                                                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-700 dark:to-zinc-600 flex items-center justify-center text-[10px] font-bold text-zinc-600 dark:text-zinc-300 shrink-0">
+                                                <div className="h-8 w-8 bg-[#f3edff] flex items-center justify-center text-[10px] font-bold text-[#8a3dff] shrink-0">
                                                     {item.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
                                                 </div>
                                                 <div className="flex flex-col min-w-0">
-                                                    <span className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 truncate">
+                                                    <span className="font-semibold text-xs text-[#191919] truncate">
                                                         {item.name}
                                                     </span>
-                                                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate max-w-[180px]">
+                                                    <span className="text-[10px] text-[#999] truncate max-w-[180px]">
                                                         {item.institusi}
                                                     </span>
                                                 </div>
@@ -246,21 +246,21 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                                         <TableCell>
                                             <Badge
                                                 variant="secondary"
-                                                className="font-normal text-[10px] px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                                                className="font-normal text-[10px] px-2 py-0.5 bg-[#f5f3f7] text-[#6b6b6b] border-0"
                                             >
                                                 {item.programIL}
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                                            <span className="text-xs font-medium text-[#6b6b6b]">
                                                 {item.month}
                                             </span>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2.5">
-                                                <div className="flex-1 h-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                                                <div className="flex-1 h-1.5 bg-[#f5f3f7] overflow-hidden">
                                                     <div
-                                                        className={`h-full rounded-full ${perf.bg} transition-all duration-700 ease-out`}
+                                                        className={`h-full ${perf.bg} transition-all duration-700 ease-out`}
                                                         style={{ width: `${item.summary.persen}%` }}
                                                     />
                                                 </div>
@@ -271,15 +271,15 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="inline-flex items-center gap-0.5 text-[11px] font-mono">
-                                                <span className="inline-flex items-center justify-center min-w-[24px] px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-bold">
+                                                <span className="inline-flex items-center justify-center min-w-[24px] px-1.5 py-0.5 bg-emerald-50 text-emerald-700 font-bold">
                                                     {item.summary.hadir}
                                                 </span>
-                                                <span className="text-zinc-300 dark:text-zinc-600 mx-0.5">/</span>
-                                                <span className="inline-flex items-center justify-center min-w-[24px] px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 font-bold">
+                                                <span className="text-[#ccc] mx-0.5">/</span>
+                                                <span className="inline-flex items-center justify-center min-w-[24px] px-1.5 py-0.5 bg-[#f3edff] text-[#8a3dff] font-bold">
                                                     {item.summary.izin}
                                                 </span>
-                                                <span className="text-zinc-300 dark:text-zinc-600 mx-0.5">/</span>
-                                                <span className="inline-flex items-center justify-center min-w-[24px] px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 font-bold">
+                                                <span className="text-[#ccc] mx-0.5">/</span>
+                                                <span className="inline-flex items-center justify-center min-w-[24px] px-1.5 py-0.5 bg-red-50 text-red-700 font-bold">
                                                     {item.summary.alpha}
                                                 </span>
                                             </div>
@@ -295,27 +295,27 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
             {/* Pagination */}
             {!loading && data.length > 0 && (
                 <div className="flex items-center justify-between pt-1">
-                    <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
-                        Menampilkan halaman <span className="font-semibold text-zinc-600 dark:text-zinc-400">{page}</span> dari{" "}
-                        <span className="font-semibold text-zinc-600 dark:text-zinc-400">{totalPages}</span> halaman
+                    <p className="text-[11px] text-[#999]">
+                        Menampilkan halaman <span className="font-semibold text-[#191919]">{page}</span> dari{" "}
+                        <span className="font-semibold text-[#191919]">{totalPages}</span> halaman
                     </p>
                     <Pagination className="w-auto mx-0">
                         <PaginationContent>
                             <PaginationItem>
                                 <PaginationPrevious
                                     onClick={() => setPage(p => Math.max(1, p - 1))}
-                                    className={`h-8 text-xs ${page === 1 ? "pointer-events-none opacity-40" : "cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
+                                    className={`h-8 text-xs ${page === 1 ? "pointer-events-none opacity-40" : "cursor-pointer hover:bg-[#f3edff] hover:text-[#8a3dff]"}`}
                                 />
                             </PaginationItem>
                             <PaginationItem>
-                                <div className="flex items-center px-3 text-xs font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 rounded-md h-8 min-w-[60px] justify-center">
+                                <div className="flex items-center px-3 text-xs font-medium text-[#191919] bg-[#f5f3f7] h-8 min-w-[60px] justify-center">
                                     {page} / {totalPages}
                                 </div>
                             </PaginationItem>
                             <PaginationItem>
                                 <PaginationNext
                                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                                    className={`h-8 text-xs ${page === totalPages ? "pointer-events-none opacity-40" : "cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
+                                    className={`h-8 text-xs ${page === totalPages ? "pointer-events-none opacity-40" : "cursor-pointer hover:bg-[#f3edff] hover:text-[#8a3dff]"}`}
                                 />
                             </PaginationItem>
                         </PaginationContent>
