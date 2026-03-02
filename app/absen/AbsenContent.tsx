@@ -514,7 +514,7 @@ export default function AbsenContent() {
                         </span>
                         <div className="text-left">
                             <p className="text-xs font-bold">📝 Form Perizinan</p>
-                            <p className="text-[10px] font-medium text-violet-600/70 dark:text-violet-400/60 mt-0.5">Isi form izin ketidakhadiran</p>
+                            <p className="text-[10px] font-medium text-violet-600/70 dark:text-violet-400/60 mt-0.5">Isi form izin ketidakhadiran (Ingat! Sebelum 09.00 / 19.00!)</p>
                         </div>
                     </a>
                 </div>

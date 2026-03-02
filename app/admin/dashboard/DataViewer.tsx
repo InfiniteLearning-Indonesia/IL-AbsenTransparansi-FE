@@ -24,7 +24,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { endpoints, apiFetch } from "@/lib/api";
-import { Loader2, Search, Users, Building2 } from "lucide-react";
+import { Loader2, Users, Building2, CalendarDays } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 type MenteeData = {
@@ -49,6 +49,9 @@ type DataViewerProps = {
 };
 
 export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }: DataViewerProps) {
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const currentMonth = monthNames[new Date().getMonth()];
+
     const [data, setData] = useState<MenteeData[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -56,6 +59,8 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
     const [totalRecords, setTotalRecords] = useState(0);
     const [program, setProgram] = useState(defaultProgram || "All");
     const [programsList, setProgramsList] = useState<string[]>([]);
+    const [month, setMonth] = useState(currentMonth);
+    const [monthsList, setMonthsList] = useState<string[]>([]);
 
     useEffect(() => {
         const loadData = async () => {
@@ -63,8 +68,8 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
             try {
                 // If filtering by mentor, use the mentor endpoint
                 const url = defaultMentor
-                    ? endpoints.getDataByMentor(defaultMentor, page)
-                    : endpoints.getAllData(program === "All" ? "" : program, page);
+                    ? endpoints.getDataByMentor(defaultMentor, page, month)
+                    : endpoints.getAllData(program === "All" ? "" : program, page, month);
                 const res = await apiFetch(url);
                 const result = await res.json();
 
@@ -75,6 +80,9 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                     if (result.meta.programs && result.meta.programs.length > 0) {
                         setProgramsList(result.meta.programs);
                     }
+                    if (result.meta.months && result.meta.months.length > 0) {
+                        setMonthsList(result.meta.months);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to load data", error);
@@ -84,7 +92,7 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
         };
 
         loadData();
-    }, [page, program, defaultMentor]);
+    }, [page, program, month, defaultMentor]);
 
     const getPerformanceColor = (persen: number) => {
         if (persen >= 80) return { bg: "bg-emerald-500", text: "text-emerald-700 dark:text-emerald-400", badge: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400", label: "Baik" };
@@ -107,11 +115,32 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                     )}
                 </div>
 
-                {!hideFilter && (
-                    <div className="flex items-center gap-2">
-                        <div className="relative">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-zinc-400" />
-                        </div>
+                <div className="flex items-center gap-2">
+                    {/* Month Filter - always shown */}
+                    <Select value={month} onValueChange={(val) => { setMonth(val); setPage(1); }}>
+                        <SelectTrigger className="w-[130px] h-8 text-xs bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700">
+                            <SelectValue placeholder="Filter Bulan" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="All">
+                                <span className="flex items-center gap-2">
+                                    <CalendarDays className="h-3 w-3 text-zinc-400" />
+                                    Semua Bulan
+                                </span>
+                            </SelectItem>
+                            {(monthsList.length > 0 ? monthsList : monthNames).map((m) => (
+                                <SelectItem key={m} value={m}>
+                                    <span className="flex items-center gap-2">
+                                        <CalendarDays className="h-3 w-3 text-zinc-400" />
+                                        {m}
+                                    </span>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    {/* Program Filter - shown when hideFilter is false */}
+                    {!hideFilter && (
                         <Select value={program} onValueChange={(val) => { setProgram(val); setPage(1); }}>
                             <SelectTrigger className="w-[180px] h-8 text-xs bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700">
                                 <SelectValue placeholder="Filter Program" />
@@ -133,8 +162,8 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                                 ))}
                             </SelectContent>
                         </Select>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
 
             {/* Table */}
@@ -185,7 +214,7 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                                             <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Data Tidak Ditemukan</p>
                                             <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
                                                 Tidak ada data mentee untuk filter yang dipilih.
-                                                {!hideFilter && " Coba ubah filter program."}
+                                                {" Coba ubah filter bulan"}{!hideFilter && " atau program"}.
                                             </p>
                                         </div>
                                     </div>

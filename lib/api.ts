@@ -15,7 +15,14 @@ export const endpoints = {
 
     // Admin (protected)
     fetchAttendance: (month: string) => `${API_BASE_URL}/admin/fetch/${month}`,
-    getAllData: (program: string, page: number) => `${API_BASE_URL}/admin/data?program=${encodeURIComponent(program)}&page=${page}&limit=10`,
+    getAllData: (program: string, page: number, month?: string) => {
+        const params = new URLSearchParams();
+        params.set("program", program);
+        params.set("page", String(page));
+        params.set("limit", "10");
+        if (month && month !== "All") params.set("month", month);
+        return `${API_BASE_URL}/admin/data?${params.toString()}`;
+    },
     getStats: (program?: string) => `${API_BASE_URL}/admin/stats${program ? `?program=${encodeURIComponent(program)}` : ""}`,
     getDailyHistory: (month?: string, program?: string) => {
         const params = new URLSearchParams();
@@ -27,7 +34,14 @@ export const endpoints = {
 
     // Mentor-specific (protected)
     getMentorList: `${API_BASE_URL}/admin/mentors`,
-    getDataByMentor: (mentor: string, page: number) => `${API_BASE_URL}/admin/data/by-mentor?mentor=${encodeURIComponent(mentor)}&page=${page}&limit=10`,
+    getDataByMentor: (mentor: string, page: number, month?: string) => {
+        const params = new URLSearchParams();
+        params.set("mentor", mentor);
+        params.set("page", String(page));
+        params.set("limit", "10");
+        if (month && month !== "All") params.set("month", month);
+        return `${API_BASE_URL}/admin/data/by-mentor?${params.toString()}`;
+    },
     getStatsByMentor: (mentor: string) => `${API_BASE_URL}/admin/stats/by-mentor?mentor=${encodeURIComponent(mentor)}`,
 };
 
