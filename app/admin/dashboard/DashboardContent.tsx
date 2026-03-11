@@ -45,6 +45,7 @@ import {
     Save,
     Shield,
     UserCog,
+    TrendingUp,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -124,14 +125,24 @@ type StatsData = {
 };
 
 export default function DashboardContent() {
+    const defaultMonth = (() => {
+        const ms = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const curr = ms[new Date().getMonth()];
+        const valid = ["Feb", "Mar", "Apr", "May", "Jun"];
+        return valid.includes(curr) ? curr : "Feb";
+    })();
+
     const [activeTab, setActiveTab] = useState<TabId>("all");
-    const [selectedMonth, setSelectedMonth] = useState<string>("Feb");
+    const [selectedMonth, setSelectedMonth] = useState<string>(defaultMonth);
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<SyncResult | null>(null);
+    const [syncAllLoading, setSyncAllLoading] = useState(false);
+    const [syncAllResult, setSyncAllResult] = useState<Record<string, unknown> | null>(null);
     const [error, setError] = useState("");
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [stats, setStats] = useState<StatsData | null>(null);
     const [statsLoading, setStatsLoading] = useState(true);
+    const [batchPerf, setBatchPerf] = useState<{ totalStartedDays: number; globalTotalDays: number; [key: string]: unknown } | null>(null);
     const [currentUser, setCurrentUser] = useState<{ _id: string; username: string; name: string; role: string } | null>(null);
     const [mentorList, setMentorList] = useState<string[]>([]);
     const router = useRouter();
@@ -191,6 +202,16 @@ export default function DashboardContent() {
         } finally {
             setStatsLoading(false);
         }
+
+        try {
+            const resPerf = await apiFetch(endpoints.batchPerformance);
+            const dataPerf = await resPerf.json();
+            if (dataPerf.success) {
+                setBatchPerf(dataPerf.batch);
+            }
+        } catch (err) {
+            console.error("Failed to fetch batch perf", err);
+        }
     }, []);
 
     useEffect(() => {
@@ -238,6 +259,30 @@ export default function DashboardContent() {
             setError("Terjadi kesalahan koneksi ke server.");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSyncAll = async () => {
+        setSyncAllLoading(true);
+        setError("");
+        setSyncAllResult(null);
+
+        try {
+            const res = await apiFetch(endpoints.syncAllMonths, {
+                method: "POST",
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                setSyncAllResult(data);
+                fetchStats();
+            } else {
+                setError(data.message || "Gagal sinkronisasi semua bulan.");
+            }
+        } catch {
+            setError("Terjadi kesalahan koneksi ke server.");
+        } finally {
+            setSyncAllLoading(false);
         }
     };
 
@@ -579,7 +624,7 @@ export default function DashboardContent() {
 
                 {/* Dashboard Content */}
                 <div className="flex-1 overflow-auto">
-                    <div className="mx-auto max-w-6xl p-6 space-y-6">
+                    <div className="mx-auto max-w-full p-6 space-y-6">
 
                         {/* ===== ALL MENTEE TAB ===== */}
                         {activeTab === "all" && (
@@ -662,6 +707,40 @@ export default function DashboardContent() {
                                         </CardContent>
                                     </Card>
                                 </div>
+
+                                {/* Batch Performance Card */}
+                                {batchPerf && (
+                                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                        <Card className="border-[#e8e0f0] shadow-sm overflow-hidden border-l-4 border-l-[#8a3dff] mb-6 mt-6">
+                                            <div className="bg-[#8a3dff] text-white p-6 relative overflow-hidden">
+                                                <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.08)_50%,rgba(255,255,255,0.08)_75%,transparent_75%)] bg-[size:20px_20px] opacity-50" />
+                                                <div className="relative">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <TrendingUp className="h-5 w-5" />
+                                                        <p className="text-xs font-bold uppercase tracking-wider text-white/80">
+                                                            Performa Kehadiran Total Batch 10
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex items-baseline gap-3">
+                                                        <p className="text-4xl sm:text-5xl font-black">{batchPerf.totalStartedDays} / {batchPerf.globalTotalDays}</p>
+                                                        <p className="text-sm text-white/70">
+                                                            Hari terjadwal telah berjalan
+                                                        </p>
+                                                    </div>
+                                                    <div className="mt-4 h-2 bg-white/20 overflow-hidden max-w-md">
+                                                        <div
+                                                            className="h-full bg-white transition-all duration-700"
+                                                            style={{ width: `${batchPerf.globalTotalDays > 0 ? Math.min((batchPerf.totalStartedDays / batchPerf.globalTotalDays) * 100, 100) : 0}%` }}
+                                                        />
+                                                    </div>
+                                                    <p className="text-[10px] text-white/50 mt-3">
+                                                        Proses mentoring telah berjalan selama <strong>{batchPerf.totalStartedDays} hari</strong> dari total {batchPerf.globalTotalDays} hari terjadwal untuk batch ini.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </Card>
+                                    </div>
+                                )}
 
                                 {/* Main Data Table */}
                                 <Card className="border-[#e8e0f0] shadow-sm">
@@ -769,6 +848,95 @@ export default function DashboardContent() {
                                         </div>
                                     </CardContent>
                                 </Card>
+
+                                {/* Sync All Months Card */}
+                                <Card className="border-[#e8e0f0] shadow-sm border-l-4 border-l-emerald-500">
+                                    <CardHeader className="border-b border-[#e8e0f0]">
+                                        <CardTitle className="text-base flex items-center gap-2">
+                                            <Database className="h-4 w-4 text-emerald-600" />
+                                            Sync Semua Bulan Sekaligus
+                                        </CardTitle>
+                                        <CardDescription className="text-xs">
+                                            Sinkronisasi data dari <strong>semua bulan</strong> yang tersedia (Feb s/d bulan ini).
+                                            Diperlukan untuk menghitung total hari terjadwal dan persentase kehadiran keseluruhan batch.
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="pt-5">
+                                        <Button
+                                            onClick={handleSyncAll}
+                                            disabled={syncAllLoading || loading}
+                                            className="h-10 px-6 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 transition-all hover:shadow-lg hover:shadow-emerald-600/30"
+                                        >
+                                            {syncAllLoading ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    Menyinkronkan semua bulan...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <RefreshCw className="mr-2 h-4 w-4" />
+                                                    Sync Semua Bulan (Feb – Jun)
+                                                </>
+                                            )}
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Sync All Result */}
+                                {syncAllResult && (
+                                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                        <Alert className="border-emerald-200 bg-emerald-50/80">
+                                            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                                            <AlertTitle className="text-emerald-800 font-semibold">
+                                                Sync Semua Bulan Berhasil!
+                                            </AlertTitle>
+                                            <AlertDescription className="text-emerald-700 text-sm">
+                                                {(syncAllResult as { message?: string }).message}
+                                            </AlertDescription>
+                                        </Alert>
+
+                                        {/* Summary */}
+                                        {(() => {
+                                            const summary = (syncAllResult as { summary?: { totalFetched?: number; totalInserted?: number; totalUpdated?: number; totalScheduledDays?: number; perMonthDays?: { month: string; days: number }[] } }).summary;
+                                            if (!summary) return null;
+                                            return (
+                                                <Card className="border-[#e8e0f0] shadow-sm">
+                                                    <CardContent className="p-5 space-y-4">
+                                                        <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
+                                                            <div className="bg-[#f3edff] p-3 text-center">
+                                                                <p className="text-[10px] font-bold uppercase text-[#8a3dff]">Total Fetched</p>
+                                                                <p className="text-xl font-black text-[#191919]">{summary.totalFetched}</p>
+                                                            </div>
+                                                            <div className="bg-emerald-50 p-3 text-center">
+                                                                <p className="text-[10px] font-bold uppercase text-emerald-600">Inserted</p>
+                                                                <p className="text-xl font-black text-[#191919]">{summary.totalInserted}</p>
+                                                            </div>
+                                                            <div className="bg-amber-50 p-3 text-center">
+                                                                <p className="text-[10px] font-bold uppercase text-amber-600">Updated</p>
+                                                                <p className="text-xl font-black text-[#191919]">{summary.totalUpdated}</p>
+                                                            </div>
+                                                            <div className="bg-[#f3edff] p-3 text-center border-2 border-[#8a3dff]">
+                                                                <p className="text-[10px] font-bold uppercase text-[#8a3dff]">Total Hari</p>
+                                                                <p className="text-xl font-black text-[#8a3dff]">{summary.totalScheduledDays}</p>
+                                                            </div>
+                                                        </div>
+
+                                                        {summary.perMonthDays && (
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {summary.perMonthDays.map((m: { month: string; days: number }) => (
+                                                                    <Badge key={m.month} className="bg-[#f5f3f7] text-[#191919] border border-[#e8e0f0] text-xs font-mono">
+                                                                        {m.month}: {m.days} hari
+                                                                    </Badge>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </CardContent>
+                                                </Card>
+                                            );
+                                        })()}
+
+                                    </div>
+                                )}
 
                                 {/* Error */}
                                 {error && (

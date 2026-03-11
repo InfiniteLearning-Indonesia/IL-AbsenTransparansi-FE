@@ -15,6 +15,7 @@ export const endpoints = {
 
     // Admin (protected)
     fetchAttendance: (month: string) => `${API_BASE_URL}/admin/fetch/${month}`,
+    syncAllMonths: `${API_BASE_URL}/admin/fetch/all`,
     getAllData: (program: string, page: number, month?: string) => {
         const params = new URLSearchParams();
         params.set("program", program);
@@ -43,6 +44,8 @@ export const endpoints = {
         return `${API_BASE_URL}/admin/data/by-mentor?${params.toString()}`;
     },
     getStatsByMentor: (mentor: string) => `${API_BASE_URL}/admin/stats/by-mentor?mentor=${encodeURIComponent(mentor)}`,
+    getMenteeDetail: (whatsapp: string) => `${API_BASE_URL}/admin/mentee/${encodeURIComponent(whatsapp)}`,
+    batchPerformance: `${API_BASE_URL}/admin/batch-performance`,
 };
 
 /**

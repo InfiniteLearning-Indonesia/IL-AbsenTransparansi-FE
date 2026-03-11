@@ -24,8 +24,9 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { endpoints, apiFetch } from "@/lib/api";
-import { Loader2, Users, Building2, CalendarDays } from "lucide-react";
+import { Loader2, Users, Building2, CalendarDays, AlertTriangle, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 type MenteeData = {
     _id: string;
@@ -33,6 +34,10 @@ type MenteeData = {
     programIL: string;
     institusi: string;
     whatsapp: string;
+    sp1?: boolean;
+    sp2?: boolean;
+    sp3?: boolean;
+    status?: string;
     summary: {
         hadir: number;
         izin: number;
@@ -47,6 +52,23 @@ type DataViewerProps = {
     defaultMentor?: string;
     hideFilter?: boolean;
 };
+
+// Get name color based on alpha count
+function getAlphaNameStyle(alpha: number): { color: string; decoration: string } {
+    if (alpha >= 5) return { color: "text-red-900", decoration: "line-through" };
+    if (alpha === 4) return { color: "text-red-600", decoration: "" };
+    if (alpha === 3) return { color: "text-amber-700", decoration: "" };
+    return { color: "text-[#191919]", decoration: "" };
+}
+
+// Get alpha badge style
+function getAlphaBadgeStyle(alpha: number): string {
+    if (alpha >= 5) return "bg-red-200 text-red-900 border-red-300";
+    if (alpha === 4) return "bg-red-100 text-red-700 border-red-200";
+    if (alpha === 3) return "bg-amber-100 text-amber-700 border-amber-200";
+    if (alpha >= 1) return "bg-yellow-50 text-yellow-700 border-yellow-200";
+    return "bg-emerald-50 text-emerald-700 border-emerald-200";
+}
 
 export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }: DataViewerProps) {
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -166,24 +188,30 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                 </div>
             </div>
 
-            {/* Table */}
-            <div className="border border-[#e8e0f0] shadow-sm overflow-hidden bg-white">
-                <Table>
+            {/* Table — full width with horizontal scroll */}
+            <div className="border border-[#e8e0f0] shadow-sm overflow-x-auto bg-white w-full">
+                <Table className="w-full">
                     <TableHeader>
                         <TableRow className="bg-[#f5f3f7]/50 hover:bg-[#f5f3f7]/50">
-                            <TableHead className="w-[250px] text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider">
+                            <TableHead className="text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider min-w-[200px]">
                                 Informasi Mentee
                             </TableHead>
-                            <TableHead className="text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider">
+                            <TableHead className="text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider min-w-[150px]">
                                 Program
                             </TableHead>
-                            <TableHead className="text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider">
+                            <TableHead className="text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider min-w-[80px]">
                                 Periode
                             </TableHead>
-                            <TableHead className="w-[200px] text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider">
+                            <TableHead className="text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider min-w-[100px] text-center">
+                                Alpha
+                            </TableHead>
+                            <TableHead className="text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider min-w-[80px] text-center">
+                                Status
+                            </TableHead>
+                            <TableHead className="text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider min-w-[180px]">
                                 Tingkat Kehadiran
                             </TableHead>
-                            <TableHead className="text-right text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider">
+                            <TableHead className="text-right text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider min-w-[120px]">
                                 Detail (H / I / A)
                             </TableHead>
                         </TableRow>
@@ -191,7 +219,7 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-48 text-center">
+                                <TableCell colSpan={7} className="h-48 text-center">
                                     <div className="flex flex-col items-center justify-center gap-3 text-muted-foreground py-8">
                                         <div className="bg-[#f3edff] p-3">
                                             <Loader2 className="h-5 w-5 animate-spin text-[#8a3dff]" />
@@ -205,7 +233,7 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                             </TableRow>
                         ) : data.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-48 text-center">
+                                <TableCell colSpan={7} className="h-48 text-center">
                                     <div className="flex flex-col items-center justify-center gap-3 py-8">
                                         <div className="bg-[#f5f3f7] p-3">
                                             <Users className="h-5 w-5 text-[#999]" />
@@ -223,25 +251,42 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                         ) : (
                             data.map((item) => {
                                 const perf = getPerformanceColor(item.summary.persen);
+                                const alphaStyle = getAlphaNameStyle(item.summary.alpha);
+                                const alphaBadge = getAlphaBadgeStyle(item.summary.alpha);
+                                const spLevel = item.sp3 ? 3 : item.sp2 ? 2 : item.sp1 ? 1 : 0;
+                                const menteeStatus = (item.status || "Active").toLowerCase();
                                 return (
                                     <TableRow
                                         key={item._id}
                                         className="group hover:bg-[#f3edff]/30 transition-colors duration-150"
                                     >
+                                        {/* Name — clickable, color-coded */}
                                         <TableCell className="py-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-8 w-8 bg-[#f3edff] flex items-center justify-center text-[10px] font-bold text-[#8a3dff] shrink-0">
+                                            <Link
+                                                href={`/admin/dashboard/data-mentee/${item.whatsapp}`}
+                                                className="flex items-center gap-3 group/link"
+                                            >
+                                                <div className={`h-8 w-8 flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                                                    item.summary.alpha >= 5 ? "bg-red-200 text-red-900" :
+                                                    item.summary.alpha === 4 ? "bg-red-100 text-red-700" :
+                                                    item.summary.alpha === 3 ? "bg-amber-100 text-amber-700" :
+                                                    "bg-[#f3edff] text-[#8a3dff]"
+                                                }`}>
                                                     {item.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
                                                 </div>
                                                 <div className="flex flex-col min-w-0">
-                                                    <span className="font-semibold text-xs text-[#191919] truncate">
+                                                    <span className={`font-semibold text-xs truncate group-hover/link:underline ${alphaStyle.color} ${alphaStyle.decoration}`}>
                                                         {item.name}
+                                                        {spLevel > 0 && (
+                                                            <AlertTriangle className="inline h-3 w-3 ml-1 text-amber-500" />
+                                                        )}
                                                     </span>
                                                     <span className="text-[10px] text-[#999] truncate max-w-[180px]">
                                                         {item.institusi}
                                                     </span>
                                                 </div>
-                                            </div>
+                                                <ExternalLink className="h-3 w-3 text-[#ccc] group-hover/link:text-[#8a3dff] transition-colors ml-auto shrink-0" />
+                                            </Link>
                                         </TableCell>
                                         <TableCell>
                                             <Badge
@@ -255,6 +300,22 @@ export default function DataViewer({ defaultProgram, defaultMentor, hideFilter }
                                             <span className="text-xs font-medium text-[#6b6b6b]">
                                                 {item.month}
                                             </span>
+                                        </TableCell>
+                                        {/* Alpha count column */}
+                                        <TableCell className="text-center">
+                                            <span className={`inline-flex items-center justify-center min-w-[32px] px-2 py-0.5 text-xs font-bold border ${alphaBadge}`}>
+                                                {item.summary.alpha}x
+                                            </span>
+                                        </TableCell>
+                                        {/* Status column */}
+                                        <TableCell className="text-center">
+                                            {menteeStatus === "terminated" ? (
+                                                <Badge className="bg-red-100 text-red-700 border-red-200 text-[10px] font-bold border">Terminated</Badge>
+                                            ) : menteeStatus.includes("non") ? (
+                                                <Badge className="bg-gray-100 text-gray-600 border-gray-200 text-[10px] font-bold border">Non-Active</Badge>
+                                            ) : (
+                                                <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold border">Active</Badge>
+                                            )}
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2.5">
